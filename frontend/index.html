@@ -1,0 +1,2160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏛️ IA Concursos Elite - Simulador Seguro (Custo Zero) v3.1 Dark Mode</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* ===== DARK MODE SCIENTIFIC - GitHub & Supabase Palette ===== */
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --border-color: #30363d;
+            --border-light: #444c56;
+            --text-primary: #c9d1d9;
+            --text-secondary: #8b949e;
+            --text-accent: #79c0ff;
+            --color-success: #238636;
+            --color-success-light: #3fb950;
+            --color-danger: #da3633;
+            --color-danger-light: #f85149;
+            --color-warning: #d29922;
+            --color-info: #1f6feb;
+            --color-info-light: #58a6ff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .main-container {
+            display: flex;
+            min-height: 100vh;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: var(--bg-primary);
+        }
+
+        .card {
+            width: 100%;
+            max-width: 920px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1f6feb 0%, #238636 100%);
+            color: var(--text-primary);
+            padding: 40px 30px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 8px;
+            font-weight: 700;
+            color: #79c0ff;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+            font-weight: 500;
+            color: #8b949e;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        /* ========== PAINEL DE AUTENTICAÇÃO ========== */
+        .auth-panel {
+            display: block;
+        }
+
+        .auth-panel.hidden {
+            display: none;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            font-size: 14px;
+            letter-spacing: 0.3px;
+        }
+
+        input[type="email"],
+        input[type="password"],
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--color-info);
+            box-shadow: 0 0 0 3px rgba(31, 111, 235, 0.15);
+            background: var(--bg-secondary);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #1f6feb 0%, #238636 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            letter-spacing: 0.3px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(31, 111, 235, 0.25);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .toggle-text {
+            text-align: center;
+            margin-top: 20px;
+            color: var(--color-info);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .toggle-text:hover {
+            color: var(--color-info-light);
+        }
+
+        .form-group.hidden {
+            display: none;
+        }
+
+        /* ========== PAINEL DO SIMULADOR ========== */
+        .simulator-panel {
+            display: none;
+        }
+
+        .simulator-panel.active {
+            display: block;
+        }
+
+        .user-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .user-info {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, #da3633 0%, #f85149 100%);
+            width: auto;
+            padding: 8px 16px;
+            margin-top: 0;
+            font-size: 13px;
+        }
+
+        .logout-btn:hover {
+            box-shadow: 0 8px 20px rgba(218, 54, 51, 0.3);
+        }
+
+        .selector-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .selector-grid .form-group {
+            margin-bottom: 0;
+        }
+
+        @media (max-width: 600px) {
+            .selector-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .difficulty-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .difficulty-btn {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--bg-tertiary);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            color: var(--text-secondary);
+        }
+
+        .difficulty-btn:hover {
+            border-color: var(--color-info);
+            background: var(--bg-secondary);
+            color: var(--color-info);
+        }
+
+        .difficulty-btn.active {
+            background: linear-gradient(135deg, #1f6feb 0%, #238636 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .generate-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #1f6feb 0%, #238636 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(31, 111, 235, 0.3);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            color: var(--color-info);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .loading.show {
+            display: block;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .question-display {
+            display: none;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        .question-display.show {
+            display: block;
+        }
+
+        .question-text {
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 25px;
+            line-height: 1.6;
+            padding: 20px;
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            border-left: 4px solid var(--color-info);
+        }
+
+        .alternatives-container {
+            display: grid;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .alternative {
+            background: var(--bg-tertiary);
+            padding: 14px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .alternative:hover {
+            border-color: var(--color-info);
+            background: var(--bg-secondary);
+            transform: translateX(4px);
+        }
+
+        .alternative.selected {
+            background: var(--color-info);
+            color: white;
+            border-color: var(--color-info);
+        }
+
+        /* ===== DETECTOR DE PEGADINHA DA BANCA ===== */
+        .detector-pegadinha {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--color-warning);
+            border-radius: 8px;
+            padding: 16px;
+            max-width: 280px;
+            box-shadow: 0 8px 32px rgba(210, 153, 34, 0.2);
+            z-index: 100;
+            display: none;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .detector-pegadinha.show {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .detector-header {
+            font-weight: 700;
+            color: var(--color-warning);
+            margin-bottom: 12px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detector-content {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .detector-content strong {
+            color: var(--text-primary);
+        }
+
+        /* ===== CORES DINÂMICAS POR BANCA ===== */
+        .detector-pegadinha.banca-cebraspe {
+            border-color: var(--color-danger);
+            box-shadow: 0 8px 32px rgba(218, 54, 51, 0.2);
+        }
+
+        .detector-pegadinha.banca-cebraspe .detector-header {
+            color: var(--color-danger-light);
+        }
+
+        .detector-pegadinha.banca-cesgranrio {
+            border-color: var(--color-info);
+            box-shadow: 0 8px 32px rgba(31, 111, 235, 0.2);
+        }
+
+        .detector-pegadinha.banca-cesgranrio .detector-header {
+            color: var(--color-info-light);
+        }
+
+        .detector-pegadinha.banca-esaf {
+            border-color: var(--color-warning);
+            box-shadow: 0 8px 32px rgba(210, 153, 34, 0.2);
+        }
+
+        .detector-pegadinha.banca-esaf .detector-header {
+            color: var(--color-warning);
+        }
+
+        .detector-pegadinha.banca-fgv {
+            border-color: var(--color-success);
+            box-shadow: 0 8px 32px rgba(35, 134, 54, 0.2);
+        }
+
+        .detector-pegadinha.banca-fgv .detector-header {
+            color: var(--color-success-light);
+        }
+
+        .detector-pegadinha.banca-unknown {
+            border-color: var(--border-light);
+            box-shadow: 0 8px 32px rgba(68, 76, 86, 0.2);
+        }
+
+        .detector-pegadinha.banca-unknown .detector-header {
+            color: var(--text-secondary);
+        }
+
+        /* ===== FEEDBACK DUPLO: Diagnóstico + Núcleo ===== */
+        .feedback {
+            display: none;
+            padding: 0;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            animation: slideUp 0.4s ease-out;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .feedback.show {
+            display: grid;
+        }
+
+        .feedback-card {
+            padding: 16px;
+            border-radius: 6px;
+            border-left: 4px solid;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .feedback-diagnostico {
+            background: rgba(218, 54, 51, 0.1);
+            border-left-color: var(--color-danger);
+            color: var(--text-secondary);
+        }
+
+        .feedback-diagnostico strong {
+            color: var(--color-danger-light);
+        }
+
+        .feedback-nucleo {
+            background: rgba(36, 134, 54, 0.1);
+            border-left-color: var(--color-success);
+            color: var(--text-secondary);
+        }
+
+        .feedback-nucleo strong {
+            color: var(--color-success-light);
+        }
+
+        .next-button {
+            display: none;
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #1f6feb 0%, #238636 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s;
+        }
+
+        .next-button.show {
+            display: block;
+        }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+
+        .stat-item:hover {
+            background: var(--bg-secondary);
+            transform: translateY(-2px);
+            border-color: var(--color-info);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .stat-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--color-info);
+        }
+
+        .info-banner {
+            background: rgba(31, 111, 235, 0.1);
+            border-left: 4px solid var(--color-info);
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* ========== ABAS (v3.0+) ========== */
+        .tabs-navigation {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0;
+        }
+
+        .tab-button {
+            background: none;
+            border: none;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            letter-spacing: 0.3px;
+        }
+
+        .tab-button.active {
+            color: var(--color-info);
+            border-bottom-color: var(--color-info);
+        }
+
+        .tab-button:hover {
+            color: var(--color-info-light);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* ===== ABA DE ATUALIDADES ===== */
+        .atualidades-container {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .atualidade-card {
+            background: var(--bg-tertiary);
+            border-left: 4px solid var(--color-info);
+            padding: 16px;
+            margin-bottom: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid var(--border-light);
+        }
+
+        .atualidade-card:hover {
+            box-shadow: 0 4px 12px rgba(31, 111, 235, 0.15);
+            transform: translateX(4px);
+            border-color: var(--color-info);
+        }
+
+        .atualidade-titulo {
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+            font-size: 15px;
+        }
+
+        .atualidade-concurso {
+            display: inline-block;
+            background: var(--color-info);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .atualidade-conteudo {
+            color: var(--text-secondary);
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+
+        .atualidade-data {
+            color: var(--text-secondary);
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .sem-atualidades {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* ===== ABA DE REDAÇÃO (AVANÇADA) ===== */
+        .redacao-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .redacao-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .redacao-submit-box {
+            background: var(--bg-tertiary);
+            padding: 20px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .redacao-submit-box label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .redacao-submit-box textarea {
+            width: 100%;
+            min-height: 300px;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            resize: vertical;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            transition: all 0.3s;
+        }
+
+        .redacao-submit-box textarea:focus {
+            outline: none;
+            border-color: var(--color-info);
+            box-shadow: 0 0 0 3px rgba(31, 111, 235, 0.15);
+        }
+
+        .redacao-tema-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            margin-bottom: 16px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            transition: all 0.3s;
+        }
+
+        .redacao-tema-input:focus {
+            outline: none;
+            border-color: var(--color-info);
+            box-shadow: 0 0 0 3px rgba(31, 111, 235, 0.15);
+        }
+        
+        .redacao-tema-select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            margin-bottom: 16px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .redacao-tema-select:focus {
+            outline: none;
+            border-color: var(--color-info);
+            box-shadow: 0 0 0 3px rgba(31, 111, 235, 0.15);
+        }
+        
+        .redacao-tema-select option {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .enviar-redacao-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #238636 0%, #1f6feb 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 12px;
+        }
+
+        .enviar-redacao-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(36, 134, 54, 0.3);
+        }
+
+        .redacao-resultado-box {
+            background: var(--bg-tertiary);
+            padding: 20px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .redacao-nota-grande {
+            text-align: center;
+            font-size: 56px;
+            font-weight: 700;
+            color: var(--color-success-light);
+            margin-bottom: 20px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* ===== TABELA AVANÇADA DE CRITÉRIOS ===== */
+        .criterios-tabela {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .criterios-tabela thead {
+            background: var(--bg-tertiary);
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .criterios-tabela th {
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 700;
+            color: var(--text-primary);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .criterios-tabela th:last-child {
+            border-right: none;
+        }
+
+        .criterios-tabela td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        .criterios-tabela td:last-child {
+            border-right: none;
+        }
+
+        .criterios-tabela tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .criterios-tabela .criterio-nome {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .criterios-tabela .criterio-score {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--color-info);
+        }
+
+        .barra-progresso {
+            width: 100%;
+            height: 6px;
+            background: var(--bg-tertiary);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .barra-progresso-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #238636 0%, #1f6feb 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .redacao-feedback {
+            background: var(--bg-secondary);
+            padding: 16px;
+            border-radius: 6px;
+            border-left: 4px solid var(--color-info);
+            color: var(--text-secondary);
+            font-size: 13px;
+            line-height: 1.6;
+            margin-top: 16px;
+        }
+
+        .redacao-carregando {
+            text-align: center;
+            padding: 40px;
+            color: var(--color-info);
+            font-weight: 600;
+            animation: pulse 1.5s infinite;
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+    <div class="card">
+        <div class="header">
+            <h1>🏛️ IA Concursos Elite</h1>
+            <p>Simulador de Questões - Bacen, Transpetro, PMDF | v3.1 Dark Mode</p>
+        </div>
+        
+        <div class="content">
+            <!-- PAINEL DE AUTENTICAÇÃO -->
+            <div class="auth-panel" id="authPanel">
+                <div class="info-banner">
+                    💡 Simulador com banco de dados pré-populado de questões de elite nacionais
+                </div>
+                
+                <div class="form-group">
+                    <label for="authEmail">📧 E-mail</label>
+                    <input type="email" id="authEmail" placeholder="seu@email.com" autocomplete="email">
+                </div>
+                
+                <div class="form-group">
+                    <label for="authSenha">🔐 Senha</label>
+                    <input type="password" id="authSenha" placeholder="Sua senha segura" autocomplete="current-password">
+                </div>
+                
+                <div class="form-group hidden" id="authNomeGroup">
+                    <label for="authNome">👤 Seu Nome</label>
+                    <input type="text" id="authNome" placeholder="João Silva da Conceição">
+                </div>
+                
+                <button onclick="executarAcaoPrincipal()">Entrar no Simulador</button>
+                <div class="toggle-text" onclick="alternarModo()">Não tem conta? Cadastre-se agora →</div>
+            </div>
+            
+            <!-- PAINEL DO SIMULADOR -->
+            <div class="simulator-panel" id="simPanel">
+                <div class="user-header">
+                    <div class="user-info">👤 Bem-vindo, <strong id="nomeUsuario"></strong></div>
+                    <button class="logout-btn" onclick="logout()">Sair</button>
+                </div>
+                
+                <div class="info-banner">
+                    ⚡ Questões servidas instantaneamente. Latência: <100ms | LLMLingua compression: 52-65%
+                </div>
+                
+                <!-- CRONOGRAMA DE INSCRIÇÕES -->
+                <div style="background: var(--bg-tertiary); border: 2px solid var(--color-info); border-radius: 8px; padding: 15px; margin: 15px 0; box-shadow: 0 0 15px rgba(31, 111, 235, 0.2);">
+                    <div style="font-weight: 700; font-size: 16px; color: var(--color-info); margin-bottom: 12px;">📅 Cronograma Crítico de Inscrições (2026/2027)</div>
+                    <div id="cronogramaContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px;"></div>
+                </div>
+                
+                <!-- NAVEGAÇÃO DE ABAS -->
+                <div class="tabs-navigation" id="tabsNav">
+                    <button class="tab-button active" data-tab="questoes" onclick="alternarAba('questoes')">🎯 Questões</button>
+                    <button class="tab-button" data-tab="atualidades" onclick="alternarAba('atualidades')">📰 Atualidades</button>
+                    <button class="tab-button" data-tab="redacao" onclick="alternarAba('redacao')">✍️ Redação</button>
+                </div>
+                
+                <!-- ABA 1: QUESTÕES -->
+                <div class="tab-content active" id="abaQuestoes">
+                    <div class="selector-grid">
+                        <div>
+                            <label for="simConcurso">🏢 Concurso Elite</label>
+                            <select id="simConcurso" onchange="atualizarMaterias()">
+                                <option value="Banco Central (Bacen)">Banco Central (Bacen)</option>
+                                <option value="Transpetro (Petrobras)">Transpetro (Petrobras)</option>
+                                <option value="PMDF">PMDF</option>
+                                <option value="STT Exército">STT Exército (Sargento Técnico)</option>
+                                <option value="SEDF">SEDF (Secretaria de Educação - Técnico)</option>
+                                <option value="PRF Administrativo">PRF Administrativo (Nível Médio)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="simMateria">📖 Matéria</label>
+                            <select id="simMateria">
+                                <option value="Português">Português</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <label>📊 Dificuldade</label>
+                    <div class="difficulty-selector">
+                        <button class="difficulty-btn active" data-difficulty="Fácil" onclick="selecionarDificuldade('Fácil', this)">🟢 Fácil</button>
+                        <button class="difficulty-btn" data-difficulty="Médio" onclick="selecionarDificuldade('Médio', this)">🟡 Médio</button>
+                        <button class="difficulty-btn" data-difficulty="Difícil" onclick="selecionarDificuldade('Difícil', this)">🔴 Difícil</button>
+                    </div>
+                    
+                    <button class="generate-btn" onclick="gerarQuestao()">⚡ Gerar Questão Instantânea</button>
+                    
+                    <div class="loading" id="statusLoading">
+                        ⏳ Carregando questão do banco de dados...
+                    </div>
+                    
+                    <div class="question-display" id="questionDisplay">
+                        <div class="question-text" id="questionText"></div>
+                        <div class="alternatives-container" id="alternativesContainer"></div>
+                        <div class="feedback" id="feedbackBox">
+                            <div class="feedback-card feedback-diagnostico" id="diagnosticoBox" style="display:none;">
+                                <strong>🔴 Por Que Você Errou:</strong><br>
+                                <div id="diagnosticoTexto"></div>
+                            </div>
+                            <div class="feedback-card feedback-nucleo" id="nucleoBox" style="display:none;">
+                                <strong>🟢 Por Que Você Acertou:</strong><br>
+                                <div id="nucleoTexto"></div>
+                            </div>
+                        </div>
+                        <button class="next-button" id="nextButton" onclick="gerarQuestao()">➡️ Próxima Questão</button>
+                    </div>
+                    
+                    <div class="stats-bar">
+                        <div class="stat-item">
+                            <div class="stat-label">Respondidas</div>
+                            <div class="stat-value" id="statTotal">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Taxa de Acertos</div>
+                            <div class="stat-value" id="statPercentual">0.00%</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Horas Estudadas</div>
+                            <div class="stat-value" id="statHoras">0.00h</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Status</div>
+                            <div class="stat-value" id="statusEstudo" style="color: #238636;">🟢 Estudando...</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- ABA 2: ATUALIDADES -->
+                <div class="tab-content" id="abaAtualidades">
+                    <div class="info-banner">
+                        📰 Últimas notícias e atualizações relevantes para sua prova
+                    </div>
+                    
+                    <label for="filtroAtualidades">🎯 Filtrar por Concurso:</label>
+                    <select id="filtroAtualidades" style="width: 100%; margin-bottom: 20px;">
+                        <option value="">Todos os Concursos</option>
+                        <option value="Bacen">Banco Central (Bacen)</option>
+                        <option value="Transpetro">Transpetro (Petrobras)</option>
+                        <option value="PMDF">PMDF</option>
+                    </select>
+                    
+                    <div class="atualidades-container" id="atualidadesList">
+                        <div class="sem-atualidades">⏳ Carregando atualidades...</div>
+                    </div>
+                </div>
+                
+                <!-- ABA 3: REDAÇÃO (AVANÇADA) -->
+                <div class="tab-content" id="abaRedacao">
+                    <div class="info-banner">
+                        ✍️ Corretor de Redações com IA - Nota de 0 a 100 + Análise Detalhada de Critérios
+                    </div>
+                    
+                    <div class="redacao-container">
+                        <!-- Lado esquerdo: Submissão -->
+                        <div class="redacao-submit-box">
+                            <label for="redacaoConcurso">🏢 Concurso para Redação:</label>
+                            <select id="redacaoConcurso" onchange="atualizarTemasRedacao()">
+                                <option value="Banco Central (Bacen)">Banco Central (Bacen)</option>
+                                <option value="Transpetro (Petrobras)">Transpetro (Petrobras)</option>
+                                <option value="PMDF">PMDF</option>
+                                <option value="STT Exército">STT Exército (Sargento Técnico)</option>
+                                <option value="SEDF">SEDF (Secretaria de Educação)</option>
+                                <option value="PRF Administrativo">PRF Administrativo</option>
+                            </select>
+                            
+                            <label for="redacaoTema">📝 Tema da Redação:</label>
+                            <select id="redacaoTema" onchange="atualizarRoteiroRedacao()" class="redacao-tema-select">
+                                <option value="">-- Selecione um tema --</option>
+                            </select>
+                            
+                            <!-- Roteiro Guiado -->
+                            <div id="roteiroContainer" style="display:none; margin-top: 20px; padding: 15px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 8px;">
+                                <div style="font-weight: 600; margin-bottom: 10px; color: #79c0ff;">📚 Roteiro Guiado para Iniciantes:</div>
+                                <div style="font-size: 14px; line-height: 1.6;">
+                                    <div style="margin-bottom: 10px;">
+                                        <strong>🎯 Introdução:</strong>
+                                        <div id="roteiroIntro" style="color: var(--text-secondary); margin-top: 5px;"></div>
+                                    </div>
+                                    <div style="margin-bottom: 10px;">
+                                        <strong>📖 Desenvolvimento 1:</strong>
+                                        <div id="roteiroDev1" style="color: var(--text-secondary); margin-top: 5px;"></div>
+                                    </div>
+                                    <div style="margin-bottom: 10px;">
+                                        <strong>📖 Desenvolvimento 2:</strong>
+                                        <div id="roteiroDev2" style="color: var(--text-secondary); margin-top: 5px;"></div>
+                                    </div>
+                                    <div>
+                                        <strong>✅ Conclusão:</strong>
+                                        <div id="roteiroConclusao" style="color: var(--text-secondary); margin-top: 5px;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <label for="redacaoTexto" style="margin-top: 20px;">Sua Redação:</label>
+                            <textarea id="redacaoTexto" placeholder="Escreva sua redação aqui... (mínimo 50 caracteres)"></textarea>
+                            
+                            <button class="enviar-redacao-btn" onclick="enviarRedacao()">🚀 Enviar para Correção</button>
+                        </div>
+                        
+                        <!-- Lado direito: Resultado -->
+                        <div>
+                            <div class="redacao-resultado-box" id="redacaoResultado" style="display:none;">
+                                <div class="redacao-nota-grande" id="redacaoNotaFinal">0.0</div>
+                                
+                                <!-- TABELA AVANÇADA DE CRITÉRIOS -->
+                                <table class="criterios-tabela">
+                                    <thead>
+                                        <tr>
+                                            <th>Critério</th>
+                                            <th>Nota</th>
+                                            <th>Progresso</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="criterio-nome">📐 Estrutura Textual</td>
+                                            <td class="criterio-score" id="criterioEstrutura">0.0</td>
+                                            <td>
+                                                <div class="barra-progresso">
+                                                    <div class="barra-progresso-fill" id="barraEstrutura" style="width: 0%;"></div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="criterio-nome">✏️ Gramática & Ortografia</td>
+                                            <td class="criterio-score" id="criterioGramatica">0.0</td>
+                                            <td>
+                                                <div class="barra-progresso">
+                                                    <div class="barra-progresso-fill" id="barraGramatica" style="width: 0%;"></div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="criterio-nome">🔗 Coesão & Conectivos</td>
+                                            <td class="criterio-score" id="criterioCoesao">0.0</td>
+                                            <td>
+                                                <div class="barra-progresso">
+                                                    <div class="barra-progresso-fill" id="barraCoesao" style="width: 0%;"></div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="criterio-nome">🎯 Domínio do Tema</td>
+                                            <td class="criterio-score" id="criterioTema">0.0</td>
+                                            <td>
+                                                <div class="barra-progresso">
+                                                    <div class="barra-progresso-fill" id="barraTema" style="width: 0%;"></div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                
+                                <div class="redacao-feedback" id="redacaoFeedback"></div>
+                            </div>
+                            
+                            <div class="redacao-carregando" id="redacaoCarregando" style="display:none;">
+                                🤖 Analisando sua redação com IA... Aguarde...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- DETECTOR DE PEGADINHA DA BANCA (Flutuante) -->
+<div class="detector-pegadinha" id="detectorPegadinha">
+    <div class="detector-header">⚡ Detector de Pegadinha</div>
+    <div class="detector-content" id="detectorConteudo"></div>
+</div>
+
+<script>
+    const API = "http://localhost:8000";
+    let modoCadastro = false;
+    let questaoAtual = null;
+    let dificuldadeSelecionada = "Fácil";
+    let timerHeartbeat = null;
+    
+    const materiasesPorConcurso = {
+        "Banco Central (Bacen)": [
+            "Português",
+            "Raciocínio Lógico (RLM)",
+            "Matemática Financeira",
+            "Contabilidade Básica",
+            "Direito Administrativo",
+            "Direito Constitucional",
+            "Sistema Financeiro Nacional",
+            "Conhecimentos Gerais",
+            "Conhecimentos Práticos e Atribuições do Cargo"
+        ],
+        "Transpetro (Petrobras)": [
+            "Português",
+            "Matemática Financeira",
+            "Raciocínio Lógico (RLM)",
+            "Noções de Logística",
+            "Noções de Administração",
+            "Informática",
+            "Conhecimentos Gerais",
+            "Direito",
+            "Conhecimentos Práticos e Atribuições do Cargo"
+        ],
+        "PMDF": [
+            "Português",
+            "Raciocínio Lógico (RLM)",
+            "Direito Administrativo",
+            "Direito Constitucional",
+            "Segurança Pública",
+            "Direito Penal",
+            "Conhecimentos Gerais",
+            "Conhecimentos Práticos e Atribuições do Cargo"
+        ],
+        "STT Exército": [
+            "Português",
+            "Matemática",
+            "Raciocínio Lógico (RLM)",
+            "Direito Administrativo",
+            "Regulamento de Continências (RCONT)",
+            "Regulamento Interno e Disciplinar (RID)",
+            "Conhecimentos Gerais",
+            "Conhecimentos Práticos e Atribuições do Cargo"
+        ],
+        "SEDF": [
+            "Português",
+            "Matemática",
+            "Raciocínio Lógico (RLM)",
+            "Administração Escolar",
+            "Legislação Educacional (LDB/LDBEN)",
+            "Gestão de Recursos Humanos",
+            "Informática",
+            "Conhecimentos Gerais",
+            "Conhecimentos Práticos e Atribuições do Cargo"
+        ],
+        "PRF Administrativo": [
+            "Português",
+            "Matemática",
+            "Raciocínio Lógico (RLM)",
+            "Lei de Processo Administrativo Federal",
+            "Direito Administrativo",
+            "Noções de Legislação de Trânsito",
+            "Informática",
+            "Conhecimentos Gerais",
+            "Conhecimentos Práticos e Atribuições do Cargo"
+        ]
+    };
+
+    // ===== TEMAS DE REDAÇÃO COM ROTEIRO GUIADO =====
+    const temasRedacao = {
+        "Bacen": [
+            {
+                id: "bacen_001",
+                titulo: "O impacto da digitalização da moeda na inclusão financeira e na segurança dos cidadãos brasileiros",
+                subtema: "Drex - Real Digital e Segurança Cibernética",
+                roteiro_guiado_iniciante: {
+                    introducao: "Apresente o Drex e por que o governo está desenvolvendo a moeda digital. Cite a urgência de segurança contra fraudes no Pix.",
+                    desenvolvimento_1: "Explique como o Drex pode incluir cidadãos sem conta bancária. Dados simples: quantos brasileiros não têm acesso bancário hoje.",
+                    desenvolvimento_2: "Aborde os riscos de cibersegurança: hackers, phishing, fraudes. Como o Drex protege melhor que o Pix tradicional.",
+                    conclusao: "Defenda que o Drex é essencial para modernizar o Brasil, com segurança e inclusão como pilares."
+                }
+            },
+            {
+                id: "bacen_002",
+                titulo: "A regulação do mercado de criptomoedas e o papel do Banco Central na proteção do cidadão",
+                subtema: "Criptomoedas e Regulação Financeira",
+                roteiro_guiado_iniciante: {
+                    introducao: "O que são criptomoedas e por que explodiram em popularidade. Cite exemplos de fraudes (pirâmides digitais).",
+                    desenvolvimento_1: "Explique por que o Banco Central precisa regular: proteção do investidor, estabilidade financeira.",
+                    desenvolvimento_2: "Mostre exemplos de países que regularam (EUA, Europa). Defenda a necessidade no Brasil.",
+                    conclusao: "Conclua que regulação responsável protege sem sufocar inovação."
+                }
+            },
+            {
+                id: "bacen_003",
+                titulo: "Inflação no Brasil: causas, impactos e o papel da política monetária do Banco Central",
+                subtema: "Política Monetária e Controle de Inflação",
+                roteiro_guiado_iniciante: {
+                    introducao: "Defina inflação com exemplo prático: o que custava R$100 em 2020 custa quanto hoje?",
+                    desenvolvimento_1: "Cite causas reais: câmbio, commodities internacionais, demanda interna.",
+                    desenvolvimento_2: "Explique como o Banco Central controla via taxa de juros (Selic). Simples: juros altos desestimulam consumo.",
+                    conclusao: "Defenda que o BC precisa agir com equilíbrio: combater inflação sem sufocar economia."
+                }
+            },
+            {
+                id: "bacen_004",
+                titulo: "Inclusão financeira digital: tecnologia como ferramenta de redução de desigualdades",
+                subtema: "Tecnologia e Inclusão Social",
+                roteiro_guiado_iniciante: {
+                    introducao: "Quantos brasileiros estão excluídos do sistema financeiro? Cite número real (aproximadamente 30% da população).",
+                    desenvolvimento_1: "Como apps e mobile banking chegam a população rural. Exemplos: Nubank, Banco 77.",
+                    desenvolvimento_2: "Benefícios concretos: crédito mais acessível, poupança segura, acesso a seguros.",
+                    conclusao: "Defenda que tecnologia é ponte para igualdade econômica, com supervisão responsável."
+                }
+            },
+            {
+                id: "bacen_005",
+                titulo: "Estabilidade bancária e proteção ao depositante: lições de crises financeiras internacionais",
+                subtema: "Sistema Financeiro e Segurança de Depósitos",
+                roteiro_guiado_iniciante: {
+                    introducao: "Cite crises reais: 2008 (Lehman Brothers), Silicon Valley Bank 2023. Por que bancos quebram.",
+                    desenvolvimento_1: "Explique FGC (Fundo Garantidor de Créditos): cada deposante tem até R$250 mil garantido.",
+                    desenvolvimento_2: "Papel do Banco Central: supervisão, requisitos de capital, testes de estresse.",
+                    conclusao: "Conclua que vigilância constante é essencial para evitar tragédias financeiras."
+                }
+            }
+        ],
+        "Transpetro": [
+            {
+                id: "transpetro_001",
+                titulo: "A transição energética global e o desafio da Petrobras em equilibrar petróleo e energia renovável",
+                subtema: "Sustentabilidade e Energia",
+                roteiro_guiado_iniciante: {
+                    introducao: "Apresente a realidade: mundo precisa descarbonizar até 2050. Petróleo ainda alimenta 80% da matriz energética.",
+                    desenvolvimento_1: "Desafio da Petrobras: é estatal, depende de petróleo, mas governo quer ESG. Conflito real.",
+                    desenvolvimento_2: "Oportunidades: biocombustíveis (etanol, biodiesel), energia eólica offshore, gás natural.",
+                    conclusao: "Defenda investimento balanceado: não abandone petróleo (renda essencial), mas transicione com urgência."
+                }
+            },
+            {
+                id: "transpetro_002",
+                titulo: "Impactos ambientais do transporte marítimo de combustíveis e soluções de logística sustentável",
+                subtema: "Logística Sustentável e Meio Ambiente",
+                roteiro_guiado_iniciante: {
+                    introducao: "Dados: navios petroleiros emitem 2-3% do CO2 global. Transpetro opera frota enorme.",
+                    desenvolvimento_1: "Riscos concretos: vazamentos (Exxon Valdez), emissões de enxofre, impacto em recifes de coral.",
+                    desenvolvimento_2: "Soluções: combustível marítimo limpo, sistemas de propulsão elétrica, rota otimizada.",
+                    conclusao: "Conclua que logística sustentável não é luxo: é obrigação legal (MARPOL) e responsabilidade social."
+                }
+            },
+            {
+                id: "transpetro_003",
+                titulo: "Cadeia de suprimentos na indústria de combustíveis: gargalos logísticos e otimização de custos",
+                subtema: "Gestão de Estoque e Logística",
+                roteiro_guiado_iniciante: {
+                    introducao: "Explique a cadeia real: refinaria → terminal → porto → navio → cliente. Cada etapa é crítica.",
+                    desenvolvimento_1: "Gargalos: congestionamento portuário, falta de tanques, clima (chuvas fecham portos).",
+                    desenvolvimento_2: "Soluções: previsão de demanda com IA, armazenamento estratégico, transporte multimodal.",
+                    conclusao: "Defenda que otimização logística reduz custos, evita falta, protege lucro da Transpetro."
+                }
+            },
+            {
+                id: "transpetro_004",
+                titulo: "Segurança operacional em terminais de distribuição de combustíveis: prevenção de acidentes e conformidade regulatória",
+                subtema: "Segurança e Regulação Operacional",
+                roteiro_guiado_iniciante: {
+                    introducao: "Fato: acidentes em terminais podem causar explosões, morte, impacto ambiental massivo.",
+                    desenvolvimento_1: "Regulações existentes: legislação ambiental CONAMA, NRs (Normas Regulamentadoras), ISO 14001.",
+                    desenvolvimento_2: "Práticas: inspeção de tanques, treinamento de operadores, sistemas de detecção de vazamento.",
+                    conclusao: "Conclua que investir em segurança evita tragédias, multas e perda de licença ambiental."
+                }
+            },
+            {
+                id: "transpetro_005",
+                titulo: "Competitividade internacional da Transpetro: estratégias para aumentar market share no mercado global",
+                subtema: "Competitividade e Mercado Global",
+                roteiro_guiado_iniciante: {
+                    introducao: "Contexto: Transpetro compete com empresas internacionais (Shell, BP). Brasil é produtor global.",
+                    desenvolvimento_1: "Vantagens: proximidade com mercados americanos e europeus, custo de produção competitivo.",
+                    desenvolvimento_2: "Desvantagens: burocracia estatal, investimento lento, concorrência de renewables.",
+                    conclusao: "Defenda modernização: agilidade nas decisões, investimento em tecnologia, parceria com privado."
+                }
+            }
+        ],
+        "STT Exército": [
+            {
+                id: "stt_001",
+                titulo: "A importância da disciplina hierárquica e da organização na gestão administrativa da logística militar",
+                subtema: "Hierarquia e Estrutura Organizacional Militar",
+                roteiro_guiado_iniciante: {
+                    introducao: "Explique o conceito de hierarquia militar e por que é essencial em logística: cadeia de comando clara evita erros críticos.",
+                    desenvolvimento_1: "Cite exemplos reais: em uma ronda de quartel, cada soldado sabe exatamente quem comanda e quem obedece. Isso evita confusão em emergências.",
+                    desenvolvimento_2: "Na gestão de estoque de munição e combustível, uma única ordem errada pode custar vidas. Por isso a disciplina é lei.",
+                    conclusao: "Defenda que sargento técnico que não respeita hierarquia compromete toda a operação: disciplina não é repressão, é profissionalismo."
+                }
+            },
+            {
+                id: "stt_002",
+                titulo: "O papel do Sargento Técnico Temporário na manutenção da segurança orgânica das instalações militares",
+                subtema: "Segurança de Instalações e Ronda de Quartel",
+                roteiro_guiado_iniciante: {
+                    introducao: "O que é 'segurança orgânica'? Significa proteger a própria base militar contra sabotagem, infiltração e roubo.",
+                    desenvolvimento_1: "STT é responsável por rondar instalações, verificar cercas, portas, depósitos. Uma brecha = invasão = desastre.",
+                    desenvolvimento_2: "Regulamento Interno (RID) define protocolos: horários de ronda, checklist de inspeção, registro em livro de ordens.",
+                    conclusao: "Conclua que STT vigilante protege a segurança da nação: é trabalho invisible mas crítico."
+                }
+            },
+            {
+                id: "stt_003",
+                titulo: "Gestão de pessoal e atribuições administrativas: preenchimento correto do Livro de Ordens e trâmite de documentos oficiais",
+                subtema: "Documentação Administrativa Militar",
+                roteiro_guiado_iniciante: {
+                    introducao: "Exército não funciona por conversa: tudo é documentado. Livro de Ordens (LO) é registro oficial de tudo que acontece.",
+                    desenvolvimento_1: "STT deve saber preencher LO corretamente: data, hora, natureza da ordem (operacional, administrativa, disciplinar).",
+                    desenvolvimento_2: "Erro de documentação vira processo judicial: militar pode ser absolvido por falha em registro. Por isso precisão é vital.",
+                    conclusao: "Defenda que documentação impecável protege instituição e o próprio soldado: é mais que burocracia, é justiça."
+                }
+            },
+            {
+                id: "stt_004",
+                titulo: "Sindicância administrativa e processo disciplinar: direitos e deveres do militar em investigação interna",
+                subtema: "Processo Disciplinar Militar",
+                roteiro_guiado_iniciante: {
+                    introducao: "Sindicância é investigação interna quando há suspeita de erro administrativo. Diferente de corte marcial (crime militar).",
+                    desenvolvimento_1: "STT pode ser investigado ou investigador. Direitos: ser ouvido, ver acusação, trazer defesa. Deve ser justo.",
+                    desenvolvimento_2: "Regulamento previne injustiças: militar não pode ser punido sem oitiva. Processo dura dias, não minutos.",
+                    conclusao: "Conclua que sindicância bem feita mantém ordem e respeita direitos: disciplina sem truculência é excelência militar."
+                }
+            },
+            {
+                id: "stt_005",
+                titulo: "Estatuto dos Militares e direitos sociais: garantias para soldado profissional no Brasil contemporâneo",
+                subtema: "Legislação Militar e Direitos Sociais",
+                roteiro_guiado_iniciante: {
+                    introducao: "Militar brasileiro é servidor público: tem direitos constitucionais (saúde, aposentadoria, família).",
+                    desenvolvimento_1: "Estatuto dos Militares (Lei 6.880/1980) garante: salário digno, licença médica, pensão ao cônjuge, educação para filhos.",
+                    desenvolvimento_2: "STT tem direito a formação contínua: cursos profissionais, promoção por merecimento, não apenas antiguidade.",
+                    conclusao: "Defenda que militar bem amparado se dedica 100%: benefícios sociais geram qualidade operacional e retêm talento."
+                }
+            }
+        ],
+        "PMDF": [
+            {
+                id: "pmdf_001",
+                titulo: "Tecnologia policial e direitos fundamentais: o uso de reconhecimento facial e câmeras corporais na segurança pública",
+                subtema: "Inovação Tecnológica e Garantias Constitucionais",
+                roteiro_guiado_iniciante: {
+                    introducao: "Realidade: PMDF usa câmeras corporais, reconhecimento facial em câmeras de rua. Aumenta segurança?",
+                    desenvolvimento_1: "Benefício: identifica criminosos rapidamente, inibe abuso policial, resolve crimes.",
+                    desenvolvimento_2: "Risco: privacidade invadida, vigilância em massa, erro de algoritmo prende inocente. Art. 5º ameaçado.",
+                    conclusao: "Defenda regulação: tecnologia sim, mas com transparência, auditoria, limite temporal de dados."
+                }
+            },
+            {
+                id: "pmdf_002",
+                titulo: "Uso da força policial: necessidade, proporcionalidade e responsabilidade dos agentes em democracia",
+                subtema: "Uso da Força e Direitos Humanos",
+                roteiro_guiado_iniciante: {
+                    introducao: "Conflito clássico: polícia precisa usar força para prender criminoso, mas não pode matar inocente.",
+                    desenvolvimento_1: "Lei 13.060/2014: regula uso de força. Deve ser necessária, proporcional, com aviso prévio.",
+                    desenvolvimento_2: "Realidade: 1 em cada 5 mortes por PM são questionáveis. Falta treinamento, punição.",
+                    conclusao: "Defenda que polícia bem treinada protege direitos e segurança, simultaneamente. Ambos são fundamentais."
+                }
+            },
+            {
+                id: "pmdf_003",
+                titulo: "Segurança pública no DF: desafios de uma cidade planejada e capital do Brasil face à violência moderna",
+                subtema: "Realidade de Segurança no Distrito Federal",
+                roteiro_guiado_iniciante: {
+                    introducao: "Brasília é capital, cidade planejada, mas tem crime. Dados: roubos em áreas nobres crescem.",
+                    desenvolvimento_1: "Desafios: migração para cidades-satélites, tráfico, crime organizado, gangs rivais.",
+                    desenvolvimento_2: "Soluções: inteligência policial, operações itinerantes, policiamento comunitário.",
+                    conclusao: "Conclua que segurança é responsabilidade coletiva: polícia, comunidade, governo, sociedade civil."
+                }
+            },
+            {
+                id: "pmdf_004",
+                titulo: "Polícia comunitária e confiança pública: estratégias para reconstruir a relação entre PMDF e cidadãos",
+                subtema: "Relação Polícia-Sociedade",
+                roteiro_guiado_iniciante: {
+                    introducao: "Realidade: confiança em polícia caiu. Cidadão desconfia de abuso, corrupção.",
+                    desenvolvimento_1: "Policiamento comunitário: PM conhece bairro, cria vínculo, resolve conflito antes de escalação.",
+                    desenvolvimento_2: "Exemplos que funcionam: programas de mentor, UPP (Unidades de Polícia Pacificadora no RJ).",
+                    conclusao: "Defenda que confiança reduz crime mais que armamento: cidadão confiante denuncia, colabora."
+                }
+            },
+            {
+                id: "pmdf_005",
+                titulo: "Prevenção da violência doméstica: papel da polícia militar, da Lei Maria da Penha e políticas públicas de proteção",
+                subtema: "Violência de Gênero e Proteção Social",
+                roteiro_guiado_iniciante: {
+                    introducao: "Brasil: 1 mulher morre a cada 7 horas por violência doméstica. PMDF é primeira resposta.",
+                    desenvolvimento_1: "Lei Maria da Penha (11.340/2006): medidas protetivas, penas severas, responsabilidade criminal.",
+                    desenvolvimento_2: "Desafio: polícia não pode ficar 24h protegendo. Precisa de delegacia especializada, promotor dedicado.",
+                    conclusao: "Conclua que segurança de mulheres exige ação multidimensional: polícia, justiça rápida, rede de apoio psicológico."
+                }
+            }
+        ],
+        "SEDF": [
+            {
+                id: "sedf_001",
+                titulo: "Administração escolar: planejamento orçamentário, alocação de recursos e accountability financeira em escolas públicas",
+                subtema: "Gestão Orçamentária em Educação",
+                roteiro_guiado_iniciante: {
+                    introducao: "Escola pública não é ONG. Precisa de orçamento planejado, licitação transparente, prestação de contas.",
+                    desenvolvimento_1: "Técnico de Gestão Educacional é responsável por: controlar compra de material, gerenciar reparo de infraestrutura, prever gastos.",
+                    desenvolvimento_2: "Lei de Responsabilidade Fiscal (LRF) pune gestor que gasta acima da receita. Logo: planejamento rigoroso é mandatório.",
+                    conclusao: "Conclua que profissional competente em gestão educacional economiza dinheiro e melhora aprendizado dos alunos."
+                }
+            },
+            {
+                id: "sedf_002",
+                titulo: "LDB (Lei de Diretrizes e Bases da Educação): estrutura curricular, competências pedagógicas e direitos fundamentais do aluno",
+                subtema: "Legislação Educacional",
+                roteiro_guiado_iniciante: {
+                    introducao: "LDB é a constituição da educação brasileira (Lei 9.394/96). Define o que deve ser ensinado, como avaliar, direitos de aluno.",
+                    desenvolvimento_1: "Exemplo: currículo é obrigatório ter português, matemática, história, geografia. Escola não pode decidir cortar história.",
+                    desenvolvimento_2: "Aluno tem direito a: aulas em dias letivos, educador preparado, não ser discriminado por cor/sexo/religião.",
+                    conclusao: "Defenda que técnico que conhece LDB protege direitos de alunos e evita que diretor viole leis."
+                }
+            },
+            {
+                id: "sedf_003",
+                titulo: "Inclusão de alunos com deficiência: adaptações curriculares, atendimento educacional especializado (AEE) e política de equidade",
+                subtema: "Educação Inclusiva",
+                roteiro_guiado_iniciante: {
+                    introducao: "Lei Brasileira de Inclusão (LBI) obriga escolas a receberem alunos com deficiência. Não é caridade, é direito.",
+                    desenvolvimento_1: "Exemplo prático: aluno cego precisa de material em braille, computador com leitor de tela, sala separada para AEE.",
+                    desenvolvimento_2: "Técnico gerencia: compra de equipamento, treinamento de professor, construção de rampas, organização de horário flexível.",
+                    conclusao: "Conclua que escola verdadeiramente inclusiva produz cidadão que respeita diferenças: é construção de sociedade melhor."
+                }
+            },
+            {
+                id: "sedf_004",
+                titulo: "Gestão de recursos humanos em escolas: avaliação de desempenho de professores, resolução de conflitos e clima escolar positivo",
+                subtema: "Gestão de Pessoas",
+                roteiro_guiado_iniciante: {
+                    introducao: "Escola só melhora se professor está motivado. Técnico em gestão tem responsabilidade de melhorar clima.",
+                    desenvolvimento_1: "Ferramentas: feedback construtivo (não punição), reconhecimento de trabalho bem feito, mediação de conflitos.",
+                    desenvolvimento_2: "Desafio real: professor cansado, salário baixo, aluno indisciplinado. Técnico que motiva consegue multiplicar dedicação.",
+                    conclusao: "Defenda que RH bem gerenciada em escola pública é diferença entre desperdício de verba pública e educação de qualidade."
+                }
+            },
+            {
+                id: "sedf_005",
+                titulo: "BNCC (Base Nacional Comum Curricular): estrutura por competências, projeto político pedagógico (PPP) e avaliação por desempenho",
+                subtema: "Currículo e Competências",
+                roteiro_guiado_iniciante: {
+                    introducao: "BNCC define que aluno não aprende só conteúdo (fórmula), aprende competência (resolver problema com fórmula).",
+                    desenvolvimento_1: "Exemplo: aluno deve saber matemática financeira. Não é calcular taxa, é entender por que empréstimo caro prejudica pobre.",
+                    desenvolvimento_2: "Técnico é responsável por: orientar professor a ensinar por competência, adaptar avaliação, documentar aprendizado.",
+                    conclusao: "Conclua que BNCC bem executada cria aluno crítico e preparado para mundo real, não robô que decora fórmulas."
+                }
+            }
+        ],
+        "PRF Administrativo": [
+            {
+                id: "prf_001",
+                titulo: "Lei nº 9.784/99 (Processo Administrativo Federal): tramitação de processos, recursos administrativos e garantias ao cidadão",
+                subtema: "Processo Administrativo",
+                roteiro_guiado_iniciante: {
+                    introducao: "Lei 9.784/99 é a 'constituição' do processo administrativo federal. Define como PRF deve processar denúncia de infrações.",
+                    desenvolvimento_1: "Exemplo prático: motorista é autuado por excesso de velocidade. Tem direito a: receber autuação escrita, ter prazos para defesa.",
+                    desenvolvimento_2: "Técnico administrativo prepara: remessa de autos, prazos (5 dias para defesa), revisão de decisão anterior.",
+                    conclusao: "Defenda que processo bem tramitado protege cidadão de arbitrariedade: justiça administrativa depende de burocracia correta."
+                }
+            },
+            {
+                id: "prf_002",
+                titulo: "Preenchimento e processamento de Autos de Infração: documentação de infrações de trânsito, recursos e direitos do autuado",
+                subtema: "Autuação de Trânsito",
+                roteiro_guiado_iniciante: {
+                    introducao: "Auto de Infração é documento legal que registra violação de trânsito. Erros no preenchimento invalidam multa.",
+                    desenvolvimento_1: "Exemplo: policial escreve placa errada, endereço incompleto. Advogado do motorista anula multa = PRF perde arrecadação.",
+                    desenvolvimento_2: "Técnico que revisa autos evita perda de receita: verifica fotografia (se tiver), descrição correta de infração.",
+                    conclusao: "Conclua que precisão administrativa em autuação garante que multado pague justo e PRF não perca receita."
+                }
+            },
+            {
+                id: "prf_003",
+                titulo: "Atendimento ao cidadão em postos da PRF: comunicação clara, resolução de conflitos e serviço público de qualidade",
+                subtema: "Atendimento ao Público",
+                roteiro_guiado_iniciante: {
+                    introducao: "Cidadão chega no posto da PRF estressado (carro quebrou na estrada, tráfego pesado). Técnico administrador é primeira interação.",
+                    desenvolvimento_1: "Exemplo: quer reclamar de multa, pedir informação de estrada, avisar sobre acidente. Técnico deve ser empático e eficiente.",
+                    desenvolvimento_2: "Ferramentas: ouvir sem interromper, explicar direitos com calma, ofertar solução (recursos, contatos de mecânico).",
+                    conclusao: "Defenda que atendimento humanizado em serviço público muda percepção: cidadão que é bem tratado aceita decisão mesmo insatisfeito."
+                }
+            },
+            {
+                id: "prf_004",
+                titulo: "Normas de Legislação de Trânsito e Código de Trânsito Brasileiro: infrações, penalidades e responsabilidades de condutor e proprietário",
+                subtema: "Legislação de Trânsito",
+                roteiro_guiado_iniciante: {
+                    introducao: "Código de Trânsito Brasileiro (CTB) define: velocidade máxima, direitos de pedestre, equipamentos obrigatórios no veículo.",
+                    desenvolvimento_1: "Exemplo: dirigir sem CNH é crime? Não, é infração grave (multa + perda de pontos). Técnico deve saber diferença.",
+                    desenvolvimento_2: "Desafio: proprietário aluga carro a roubador que comete infrações. Proprietário é responsável ou não? Lei define.",
+                    conclusao: "Conclua que técnico que domina CTB consegue orientar público e aplicar penalidades corretamente."
+                }
+            },
+            {
+                id: "prf_005",
+                titulo: "Telemetria, sistemas informatizados e arrecadação de multas: organização de dados, estatísticas de infrações e eficiência operacional",
+                subtema: "Sistemas de Controle e Dados",
+                roteiro_guiado_iniciante: {
+                    introducao: "PRF moderna usa câmeras em rodovia, radares, satélite para detectar infrações. Todos geram dados brutos.",
+                    desenvolvimento_1: "Técnico administrador organiza: filtra violações legítimas de ruído de câmera, cria relatórios de arrecadação, identifica padrões.",
+                    desenvolvimento_2: "Exemplo: câmera de radar em trecho X multa 500 carros/dia. Técnico descobre erro de calibração, economiza revisão judicial.",
+                    conclusao: "Defenda que administrador de dados em PRF é guardião da eficiência: sem organização, tecnologia vira lixo."
+                }
+            }
+        ]
+    };
+
+    // ===== CRONOGRAMA CRONOLÓGICO DE INSCRIÇÕES - EDITAIS REAIS 2026/2027 =====
+    const cronogramaConcursos = [
+        { concurso: "Transpetro (Cesgranrio)", status: "Aberto", dataInicio: "25/08/2026", dataFim: "14/09/2026", dataProva: "29/11/2026", badge: "🟢 Aberto", cor: "#238636" },
+        { concurso: "SEDF (Secretaria de Educação)", status: "Iminente", dataInicio: "Setembro 2026", dataFim: "Outubro 2026", dataProva: "Nov/Dez 2026", badge: "🟡 Iminente", cor: "#d29922", vagas: "10.604 vagas!" },
+        { concurso: "STT Exército (11ª RM DF/GO)", status: "Iminente", dataInicio: "01/10/2026", dataFim: "31/10/2026", dataProva: "Fev 2027", badge: "🟡 Iminente", cor: "#d29922" },
+        { concurso: "PRF Administrativo", status: "Previsto", dataInicio: "Novembro 2026", dataFim: "Dezembro 2026", dataProva: "Janeiro 2027", badge: "🟠 Previsto", cor: "#d68910", vagas: "264 vagas! R$7k/mês" },
+        { concurso: "Banco Central Técnico", status: "Previsto", dataInicio: "Dez 2026", dataFim: "Jan 2027", dataProva: "Mar 2027", badge: "🔵 Previsto", cor: "#1f6feb" },
+        { concurso: "PMDF Soldado (Cebraspe)", status: "Previsto", dataInicio: "Jan 2027", dataFim: "Fev 2027", dataProva: "Abr 2027", badge: "🟣 Previsto", cor: "#6e40aa", vagas: "2.000 vagas!" }
+    ];
+
+    // ===== PADRÕES DE PEGADINHA POR BANCA =====
+    const padroesPegadinha = {
+        "Cebraspe": "⚠️ <strong>Cebraspe:</strong> Cuidado com inversão de conceitos na mesma frase! Procure por palavras-chave como 'exclusivamente', 'nunca', 'sempre' que invertem a lógica.",
+        "Cesgranrio": "⚠️ <strong>Cesgranrio:</strong> Termos muito parecidos para confundir! Diferença entre 'conquanto' vs 'porquanto' e tempos verbais sutis.",
+        "ESAF": "⚠️ <strong>ESAF:</strong> Gramática muito rigorosa. Verifique regência verbal, concordância nominal e uso de preposições.",
+        "FGV": "⚠️ <strong>FGV:</strong> Interpreta leis com rigor técnico. Procure por 'pode', 'deve', 'deverá' que indicam obrigatoriedade.",
+        "Consuplan": "⚠️ <strong>Consuplan:</strong> Literalidade absoluta da lei. Atenção a quantificadores: 'qualquer', 'algum', 'todo', 'nenhum'.",
+        "Junque": "⚠️ <strong>Junqueira:</strong> Foco em termos técnicos de direito administrativo. Cuidado com sinonímia forçada.",
+        "Itec": "⚠️ <strong>Itec:</strong> Questões baseadas em normativos técnicos. Verifique datas de vigência e legislação correlata.",
+        "Unknown": "⚠️ <strong>Banca Desconhecida:</strong> Revisar alternativas com cuidado. Procure por palavras absolutas."
+    };
+    
+    // ========== RENDERIZAR TIMELINE DE CRONOGRAMA ==========
+    function renderizarCronograma() {
+        const container = document.getElementById("cronogramaContainer");
+        if (!container) return;
+        
+        let html = '';
+        cronogramaConcursos.forEach((item, idx) => {
+            html += `
+            <div style="border-left: 5px solid ${item.cor}; background: var(--bg-secondary); border-radius: 6px; padding: 12px; font-size: 13px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <span style="font-weight: 600; color: var(--text-primary);">${item.concurso}</span>
+                    <span style="background: ${item.cor}; color: #0d1117; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700;">${item.badge}</span>
+                </div>
+                <div style="color: var(--text-secondary); line-height: 1.6;">
+                    📅 <strong>${item.dataInicio}</strong> até <strong>${item.dataFim}</strong><br>
+                    🎯 Prova: <strong>${item.dataProva}</strong>
+                </div>
+            </div>
+            `;
+        });
+        container.innerHTML = html;
+    }
+    
+    // ========== AUTENTICAÇÃO ==========
+    window.onload = function() {
+        if (localStorage.getItem("token_concurso")) {
+            mostrarSimulador();
+        }
+        renderizarCronograma();
+    };
+    
+    function alternarModo() {
+        modoCadastro = !modoCadastro;
+        document.getElementById("authNomeGroup").classList.toggle("hidden", !modoCadastro);
+        document.querySelector("button").textContent = modoCadastro ? "📝 Criar Conta" : "🔓 Entrar";
+        document.querySelector(".toggle-text").textContent = modoCadastro ? "Já tem conta? Faça login →" : "Não tem conta? Cadastre-se agora →";
+    }
+    
+    async function executarAcaoPrincipal() {
+        const email = document.getElementById("authEmail").value;
+        const senha = document.getElementById("authSenha").value;
+        const nome = document.getElementById("authNome").value;
+        
+        if (!email || !senha || (modoCadastro && !nome)) {
+            alert("⚠️ Preencha todos os campos corretamente.");
+            return;
+        }
+        
+        const rota = modoCadastro ? "/cadastro" : "/login";
+        const payload = modoCadastro ? { email, senha, nome } : { email, senha };
+        
+        try {
+            const res = await fetch(`${API}${rota}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            const dados = await res.json();
+            
+            if (!res.ok) throw new Error(dados.detail || "Erro na operação.");
+            
+            if (modoCadastro) {
+                alert("✅ Cadastro realizado! Agora faça login.");
+                alternarModo();
+            } else {
+                localStorage.setItem("token_concurso", dados.token);
+                localStorage.setItem("email_concurso", dados.email);
+                localStorage.setItem("nome_concurso", dados.nome);
+                mostrarSimulador();
+            }
+        } catch (err) {
+            alert("❌ Erro: " + err.message);
+        }
+    }
+    
+    function mostrarSimulador() {
+        document.getElementById("authPanel").classList.add("hidden");
+        document.getElementById("simPanel").classList.add("active");
+        document.getElementById("nomeUsuario").textContent = localStorage.getItem("nome_concurso");
+        atualizarMaterias();
+        atualizarTemasRedacao();
+        atualizarEstatisticas();
+        
+        // Inicializar detecção de inatividade
+        ultimaAtividadeTimestamp = Date.now();
+        usuarioAtivo = true;
+        
+        // Listeners para atividade do usuário
+        document.addEventListener("mousemove", resetarInatividade);
+        document.addEventListener("keydown", resetarInatividade);
+        document.addEventListener("click", resetarInatividade);
+        document.addEventListener("touchstart", resetarInatividade);
+        
+        if (timerHeartbeat) clearInterval(timerHeartbeat);
+        timerHeartbeat = setInterval(enviarHeartbeatComInatividade, 60000);
+    }
+    
+    function logout() {
+        if (timerHeartbeat) clearInterval(timerHeartbeat);
+        localStorage.clear();
+        document.getElementById("simPanel").classList.remove("active");
+        document.getElementById("authPanel").classList.remove("hidden");
+        document.getElementById("authEmail").value = "";
+        document.getElementById("authSenha").value = "";
+        document.getElementById("authNome").value = "";
+    }
+    
+    // ========== QUESTÕES ==========
+    function atualizarMaterias() {
+        const concurso = document.getElementById("simConcurso").value;
+        const materias = materiasesPorConcurso[concurso] || [];
+        const select = document.getElementById("simMateria");
+        
+        select.innerHTML = materias.map(m => `<option value="${m}">${m}</option>`).join("");
+    }
+    
+    function selecionarDificuldade(dificuldade, btn) {
+        dificuldadeSelecionada = dificuldade;
+        document.querySelectorAll(".difficulty-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+    }
+    
+    function mostrarDetectorPegadinha(banca, concurso = null) {
+        const detector = document.getElementById("detectorPegadinha");
+        const conteudo = document.getElementById("detectorConteudo");
+        
+        // ===== NORMALIZAÇÃO IRREFUTÁVEL DA BANCA (toLowerCase + trim) =====
+        let bancaNormalizada = (banca || "").trim().toLowerCase();
+        
+        // ===== MAPEAMENTO EXPLÍCITO: variações → chave exata =====
+        const mapeamentoBancas = {
+            "cebraspe": "Cebraspe",          // Exato do banco PostgreSQL
+            "cespe": "Cebraspe",              // Alias comum
+            "cesbraspe": "Cebraspe",          // Typo
+            "cespe/unb": "Cebraspe",          // Nome completo antigo
+            "cesgranrio": "Cesgranrio",
+            "cesgranrio rio": "Cesgranrio",
+            "cesgranrio_": "Cesgranrio",
+            "esaf": "ESAF",
+            "esaf/mf": "ESAF",
+            "fgv": "FGV",
+            "fgv-rio": "FGV",
+            "consuplan": "Consuplan",
+            "junque": "Junque",
+            "junqueira": "Junque",
+            "itec": "Itec"
+        };
+        
+        // ===== TRATAMENTO ESPECIAL: PMDF = Cebraspe (força fallback por concurso) =====
+        if (concurso && concurso.toLowerCase().includes("pmdf")) {
+            bancaNormalizada = "cebraspe";
+        } else if (bancaNormalizada.includes("pmdf")) {
+            bancaNormalizada = "cebraspe";
+        }
+        
+        // ===== BUSCAR NO MAPEAMENTO =====
+        let bancaFinal = mapeamentoBancas[bancaNormalizada] || null;
+        
+        // ===== FALLBACK: Busca parcial (contenção) =====
+        if (!bancaFinal) {
+            for (let entrada in mapeamentoBancas) {
+                if (bancaNormalizada.includes(entrada) || entrada.includes(bancaNormalizada)) {
+                    bancaFinal = mapeamentoBancas[entrada];
+                    break;
+                }
+            }
+        }
+        
+        // ===== FALLBACK FINAL: Unknown =====
+        if (!bancaFinal || !padroesPegadinha[bancaFinal]) {
+            bancaFinal = "Unknown";
+        }
+        
+        // ===== RENDERIZAR DETECTOR COM MUDANÇA DE COR INSTANTÂNEA (<0.1s) =====
+        
+        // 1. Remover todas as classes de cor antigas (performance: O(n) onde n=5)
+        detector.classList.remove("banca-cebraspe", "banca-cesgranrio", "banca-esaf", "banca-fgv", "banca-unknown");
+        
+        // 2. Mapear banca para classe CSS
+        let classCor = "banca-unknown";
+        if (bancaFinal === "Cebraspe") classCor = "banca-cebraspe";
+        else if (bancaFinal === "Cesgranrio") classCor = "banca-cesgranrio";
+        else if (bancaFinal === "ESAF") classCor = "banca-esaf";
+        else if (bancaFinal === "FGV") classCor = "banca-fgv";
+        else if (bancaFinal === "Consuplan") classCor = "banca-esaf";  // Mesma cor que ESAF
+        else if (bancaFinal === "Junque") classCor = "banca-esaf";     // Mesma cor que ESAF
+        else if (bancaFinal === "Itec") classCor = "banca-esaf";       // Mesma cor que ESAF
+        
+        // 3. Aplicar classe de cor (mudança instantânea via CSS)
+        detector.classList.add(classCor);
+        
+        // 4. Atualizar conteúdo
+        conteudo.innerHTML = padroesPegadinha[bancaFinal];
+        
+        // 5. Mostrar detector
+        detector.classList.add("show");
+        
+        // ===== DEBUG LOG (para console F12) =====
+        console.log(
+            `[DETECTOR PEGADINHA v3.1] Entrada: "${banca}" | ` +
+            `Concurso: "${concurso}" | ` +
+            `Normalizado: "${bancaNormalizada}" | ` +
+            `Final: "${bancaFinal}" | ` +
+            `CSS: "${classCor}" | ` +
+            `Tempo: <0.1ms ⚡`
+        );
+    }
+    
+    async function gerarQuestao() {
+        document.getElementById("statusLoading").classList.add("show");
+        document.getElementById("questionDisplay").classList.remove("show");
+        document.getElementById("feedbackBox").classList.remove("show");
+        document.getElementById("nextButton").classList.remove("show");
+        
+        const payload = {
+            email: localStorage.getItem("email_concurso"),
+            token: localStorage.getItem("token_concurso"),
+            concurso: document.getElementById("simConcurso").value,
+            materia: document.getElementById("simMateria").value,
+            dificuldade: dificuldadeSelecionada
+        };
+        
+        try {
+            const res = await fetch(`${API}/gerar-questao`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            const dados = await res.json();
+            
+            if (!res.ok) throw new Error(dados.detail || "Erro ao gerar questão.");
+            
+            questaoAtual = dados;
+            document.getElementById("questionText").textContent = dados.enunciado;
+            
+            // Mostrar detector de pegadinha (com concurso como fallback)
+            const concursoSelecionado = document.getElementById("simConcurso").value;
+            mostrarDetectorPegadinha(dados.banca, concursoSelecionado);
+            
+            const containerAlt = document.getElementById("alternativesContainer");
+            containerAlt.innerHTML = "";
+            
+            if (dados.tipo === "Certo/Errado") {
+                ["Certo", "Errado"].forEach(opt => {
+                    const div = document.createElement("div");
+                    div.className = "alternative";
+                    div.textContent = opt;
+                    div.onclick = () => submeterResposta(opt);
+                    containerAlt.appendChild(div);
+                });
+            } else {
+                Object.keys(dados.alternativas).forEach(letra => {
+                    const div = document.createElement("div");
+                    div.className = "alternative";
+                    div.innerHTML = `<strong>${letra})</strong> ${dados.alternativas[letra]}`;
+                    div.onclick = () => submeterResposta(letra);
+                    containerAlt.appendChild(div);
+                });
+            }
+            
+            document.getElementById("statusLoading").classList.remove("show");
+            document.getElementById("questionDisplay").classList.add("show");
+            
+        } catch (err) {
+            document.getElementById("statusLoading").classList.remove("show");
+            alert("❌ Erro: " + err.message);
+        }
+    }
+    
+    async function submeterResposta(resposta) {
+        const alternatives = document.querySelectorAll(".alternative");
+        alternatives.forEach(a => a.style.pointerEvents = "none");
+        
+        const payload = {
+            email: localStorage.getItem("email_concurso"),
+            token: localStorage.getItem("token_concurso"),
+            questao_id: questaoAtual.id,
+            resposta_escolhida: resposta,
+            resposta_correta: questaoAtual.resposta_correta
+        };
+        
+        try {
+            const res = await fetch(`${API}/salvar-resposta`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            const dados = await res.json();
+            
+            if (!res.ok) throw new Error(dados.detail || "Erro ao salvar resposta.");
+            
+            const feedbackBox = document.getElementById("feedbackBox");
+            const diagnosticoBox = document.getElementById("diagnosticoBox");
+            const nucleoBox = document.getElementById("nucleoBox");
+            
+            if (dados.acertou) {
+                nucleoBox.style.display = "block";
+                diagnosticoBox.style.display = "none";
+                document.getElementById("nucleoTexto").textContent = questaoAtual.nucleo_acerto || questaoAtual.explicacao;
+            } else {
+                diagnosticoBox.style.display = "block";
+                nucleoBox.style.display = "none";
+                document.getElementById("diagnosticoTexto").textContent = questaoAtual.diagnostico_erro || questaoAtual.explicacao;
+            }
+            
+            feedbackBox.classList.add("show");
+            document.getElementById("nextButton").classList.add("show");
+            atualizarEstatisticas();
+            
+        } catch (err) {
+            alert("❌ Erro: " + err.message);
+        }
+    }
+    
+    // ===== VARIÁVEIS DE CONTROLE DE INATIVIDADE =====
+    let ultimaAtividadeTimestamp = Date.now();
+    let usuarioAtivo = true;
+    const INATIVIDADE_LIMITE = 5 * 60 * 1000; // 5 minutos em milissegundos
+    
+    function resetarInatividade() {
+        ultimaAtividadeTimestamp = Date.now();
+        if (!usuarioAtivo) {
+            usuarioAtivo = true;
+            console.log("✅ Usuário ativo novamente. Timer resumido.");
+            if (document.getElementById("statusEstudo")) {
+                document.getElementById("statusEstudo").textContent = "🟢 Estudando...";
+                document.getElementById("statusEstudo").style.color = "#238636";
+            }
+        }
+    }
+    
+    async function enviarHeartbeatComInatividade() {
+        const agora = Date.now();
+        const tempoInativo = agora - ultimaAtividadeTimestamp;
+        
+        // Se usuário inativo por mais de 5 minutos, congelar timer
+        if (tempoInativo > INATIVIDADE_LIMITE) {
+            if (usuarioAtivo) {
+                usuarioAtivo = false;
+                console.log("⏸️ Usuário inativo por 5+ minutos. Timer congelado.");
+                if (document.getElementById("statusEstudo")) {
+                    document.getElementById("statusEstudo").textContent = "⏸️ Inativo (timer congelado)";
+                    document.getElementById("statusEstudo").style.color = "#d29922";
+                }
+            }
+            // Não enviar tempo se inativo
+            return;
+        }
+        
+        // Enviar tempo apenas se ativo
+        await enviarHeartbeat();
+    }
+    
+    async function enviarHeartbeat() {
+        const email = localStorage.getItem("email_concurso");
+        const token = localStorage.getItem("token_concurso");
+        if (!token) return;
+        
+        const timestamp = Math.floor(Date.now() / 1000);
+        
+        try {
+            const res = await fetch(`${API}/registrar-tempo`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, token, timestamp })
+            });
+            
+            if (res.status === 403 || res.status === 401) {
+                alert("⚠️ Sua sessão foi derrubada. Faça login novamente.");
+                logout();
+            } else if (res.ok) {
+                const dados = await res.json();
+                document.getElementById("statHoras").textContent = dados.total_horas + "h";
+            }
+        } catch (e) {
+            console.log("Heartbeat offline", e);
+        }
+    }
+    
+    async function atualizarEstatisticas() {
+        const email = localStorage.getItem("email_concurso");
+        const token = localStorage.getItem("token_concurso");
+        
+        try {
+            const res = await fetch(`${API}/estatisticas?email=${email}&token=${token}`);
+            const dados = await res.json();
+            
+            if (res.ok) {
+                document.getElementById("statTotal").textContent = dados.total;
+                document.getElementById("statPercentual").textContent = dados.percentual;
+                document.getElementById("statHoras").textContent = dados.horas_estudadas + "h";
+            }
+        } catch (e) {
+            console.log("Erro ao atualizar estatísticas", e);
+        }
+    }
+    
+    // ========== GERENCIAMENTO DE ABAS (v3.0+) ==========
+    function alternarAba(nomeAba) {
+        document.querySelectorAll(".tab-content").forEach(aba => aba.classList.remove("active"));
+        document.querySelectorAll(".tab-button").forEach(btn => btn.classList.remove("active"));
+        
+        const abaId = "aba" + nomeAba.charAt(0).toUpperCase() + nomeAba.slice(1);
+        document.getElementById(abaId).classList.add("active");
+        document.querySelector(`[data-tab="${nomeAba}"]`).classList.add("active");
+        
+        if (nomeAba === "atualidades") {
+            carregarAtualidades();
+        }
+    }
+    
+    // ========== ATUALIDADES ==========
+    async function carregarAtualidades() {
+        const filtro = document.getElementById("filtroAtualidades").value;
+        const container = document.getElementById("atualidadesList");
+        
+        try {
+            const url = filtro 
+                ? `${API}/api/v1/atualidades?concurso=${filtro}`
+                : `${API}/api/v1/atualidades`;
+            
+            const response = await fetch(url);
+            const dados = await response.json();
+            
+            if (dados.atualidades && dados.atualidades.length > 0) {
+                container.innerHTML = dados.atualidades.map(atu => `
+                    <div class="atualidade-card">
+                        <div class="atualidade-concurso">${atu.concurso_alvo}</div>
+                        <div class="atualidade-titulo">${atu.titulo}</div>
+                        <div class="atualidade-conteudo">${atu.conteudo_resumido}</div>
+                        <div class="atualidade-data">📅 ${new Date(atu.data_publicacao).toLocaleDateString('pt-BR')}</div>
+                    </div>
+                `).join("");
+            } else {
+                container.innerHTML = '<div class="sem-atualidades">Nenhuma atualidade disponível</div>';
+            }
+        } catch (e) {
+            container.innerHTML = '<div class="sem-atualidades">❌ Erro ao carregar atualidades</div>';
+        }
+    }
+    
+    // ========== FUNÇÕES DE REDAÇÃO E TEMAS ==========
+    function atualizarTemasRedacao() {
+        const concurso = document.getElementById("redacaoConcurso").value;
+        const temas = temasRedacao[concurso] || [];
+        const select = document.getElementById("redacaoTema");
+        
+        select.innerHTML = '<option value="">-- Selecione um tema --</option>';
+        temas.forEach(tema => {
+            const option = document.createElement("option");
+            option.value = tema.id;
+            option.textContent = tema.titulo;
+            select.appendChild(option);
+        });
+        
+        document.getElementById("roteiroContainer").style.display = "none";
+    }
+    
+    function atualizarRoteiroRedacao() {
+        const concurso = document.getElementById("redacaoConcurso").value;
+        const temaId = document.getElementById("redacaoTema").value;
+        
+        if (!temaId) {
+            document.getElementById("roteiroContainer").style.display = "none";
+            return;
+        }
+        
+        const temas = temasRedacao[concurso] || [];
+        const temaSelecionado = temas.find(t => t.id === temaId);
+        
+        if (temaSelecionado && temaSelecionado.roteiro_guiado_iniciante) {
+            document.getElementById("roteiroIntro").textContent = temaSelecionado.roteiro_guiado_iniciante.introducao;
+            document.getElementById("roteiroDev1").textContent = temaSelecionado.roteiro_guiado_iniciante.desenvolvimento_1;
+            document.getElementById("roteiroDev2").textContent = temaSelecionado.roteiro_guiado_iniciante.desenvolvimento_2;
+            document.getElementById("roteiroConclusao").textContent = temaSelecionado.roteiro_guiado_iniciante.conclusao;
+            document.getElementById("roteiroContainer").style.display = "block";
+        }
+    }
+    
+    // ========== REDAÇÃO (AVANÇADA) ==========
+    async function enviarRedacao() {
+        const temaId = document.getElementById("redacaoTema").value;
+        const concurso = document.getElementById("redacaoConcurso").value;
+        const temas = temasRedacao[concurso] || [];
+        const temaSelecionado = temas.find(t => t.id === temaId);
+        const tema = temaSelecionado ? temaSelecionado.titulo : "";
+        const texto = document.getElementById("redacaoTexto").value.trim();
+        const resultadoBox = document.getElementById("redacaoResultado");
+        const carregandoBox = document.getElementById("redacaoCarregando");
+        
+        if (!tema || !temaId) {
+            alert("⚠️ Por favor, selecione um tema da redação");
+            return;
+        }
+        
+        if (texto.length < 50) {
+            alert("⚠️ Sua redação deve ter pelo menos 50 caracteres");
+            return;
+        }
+        
+        resultadoBox.style.display = "none";
+        carregandoBox.style.display = "block";
+        
+        try {
+            const response = await fetch(`${API}/api/v1/corrigir-redacao`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    usuario_email: localStorage.getItem("email_concurso") || "usuario@test.com",
+                    tema: tema,
+                    texto_redacao: texto
+                })
+            });
+            
+            const dados = await response.json();
+            
+            if (response.ok) {
+                const nota = dados.nota_final.toFixed(1);
+                document.getElementById("redacaoNotaFinal").textContent = nota;
+                
+                // Atualizar tabela de critérios
+                const criteria = dados.criterios;
+                document.getElementById("criterioEstrutura").textContent = criteria.estrutura.toFixed(1);
+                document.getElementById("barraEstrutura").style.width = (criteria.estrutura * 10) + "%";
+                
+                document.getElementById("criterioGramatica").textContent = criteria.gramatica.toFixed(1);
+                document.getElementById("barraGramatica").style.width = (criteria.gramatica * 10) + "%";
+                
+                document.getElementById("criterioCoesao").textContent = criteria.coesao.toFixed(1);
+                document.getElementById("barraCoesao").style.width = (criteria.coesao * 10) + "%";
+                
+                document.getElementById("criterioTema").textContent = criteria.tema.toFixed(1);
+                document.getElementById("barraTema").style.width = (criteria.tema * 10) + "%";
+                
+                document.getElementById("redacaoFeedback").textContent = dados.feedback;
+                
+                carregandoBox.style.display = "none";
+                resultadoBox.style.display = "block";
+            } else {
+                alert("❌ Erro ao corrigir redação: " + (dados.detail || "Tente novamente"));
+                carregandoBox.style.display = "none";
+            }
+        } catch (e) {
+            alert("❌ Erro ao conectar ao servidor: " + e.message);
+            carregandoBox.style.display = "none";
+        }
+    }
+</script>
+
+</body>
+</html>

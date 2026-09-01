@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  postgres_db:
+    image: postgres:15-alpine
+    container_name: postgres_concursos
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: senha_segura_123
+      POSTGRES_DB: admin
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - rede_sistema
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend_api:
+    image: python:3.10-slim
+    container_name: backend_questoes
+    volumes:
+      - ./backend:/app
+      - ./frontend:/app/frontend
+    working_dir: /app
+    command: sh -c "pip install --no-cache-dir -r requirements.txt && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgresql://admin:senha_segura_123@postgres_db:5432/admin
+      - OLLAMA_API_URL=http://host.docker.internal:11434
+      - OLLAMA_MODEL=concursos-elite
+    networks:
+      - rede_sistema
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  rede_sistema:
+    driver: bridge

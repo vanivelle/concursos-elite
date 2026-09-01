@@ -1,0 +1,1426 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏛️ IA Concursos Elite - Simulador Seguro (Custo Zero) v3.1 Dark Mode</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* ===== DARK MODE SCIENTIFIC - GitHub & Supabase Palette ===== */
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --border-color: #30363d;
+            --border-light: #444c56;
+            --text-primary: #c9d1d9;
+            --text-secondary: #8b949e;
+            --text-accent: #79c0ff;
+            --color-success: #238636;
+            --color-success-light: #3fb950;
+            --color-danger: #da3633;
+            --color-danger-light: #f85149;
+            --color-warning: #d29922;
+            --color-info: #1f6feb;
+            --color-info-light: #58a6ff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .main-container {
+            display: flex;
+            min-height: 100vh;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: var(--bg-primary);
+        }
+
+        .card {
+            width: 100%;
+            max-width: 920px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1f6feb 0%, #238636 100%);
+            color: var(--text-primary);
+            padding: 40px 30px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 8px;
+            font-weight: 700;
+            color: #79c0ff;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+            font-weight: 500;
+            color: #8b949e;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        /* ========== PAINEL DE AUTENTICAÇÃO ========== */
+        .auth-panel {
+            display: block;
+        }
+
+        .auth-panel.hidden {
+            display: none;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            font-size: 14px;
+            letter-spacing: 0.3px;
+        }
+
+        input[type="email"],
+        input[type="password"],
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--color-info);
+            box-shadow: 0 0 0 3px rgba(31, 111, 235, 0.15);
+            background: var(--bg-secondary);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #1f6feb 0%, #238636 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            letter-spacing: 0.3px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(31, 111, 235, 0.25);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .toggle-text {
+            text-align: center;
+            margin-top: 20px;
+            color: var(--color-info);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .toggle-text:hover {
+            color: var(--color-info-light);
+        }
+
+        .form-group.hidden {
+            display: none;
+        }
+
+        /* ========== PAINEL DO SIMULADOR ========== */
+        .simulator-panel {
+            display: none;
+        }
+
+        .simulator-panel.active {
+            display: block;
+        }
+
+        .user-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .user-info {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, #da3633 0%, #f85149 100%);
+            width: auto;
+            padding: 8px 16px;
+            margin-top: 0;
+            font-size: 13px;
+        }
+
+        .logout-btn:hover {
+            box-shadow: 0 8px 20px rgba(218, 54, 51, 0.3);
+        }
+
+        .selector-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .selector-grid .form-group {
+            margin-bottom: 0;
+        }
+
+        @media (max-width: 600px) {
+            .selector-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .difficulty-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .difficulty-btn {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--bg-tertiary);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            color: var(--text-secondary);
+        }
+
+        .difficulty-btn:hover {
+            border-color: var(--color-info);
+            background: var(--bg-secondary);
+            color: var(--color-info);
+        }
+
+        .difficulty-btn.active {
+            background: linear-gradient(135deg, #1f6feb 0%, #238636 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .generate-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #1f6feb 0%, #238636 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(31, 111, 235, 0.3);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            color: var(--color-info);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .loading.show {
+            display: block;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .question-display {
+            display: none;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        .question-display.show {
+            display: block;
+        }
+
+        .question-text {
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 25px;
+            line-height: 1.6;
+            padding: 20px;
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            border-left: 4px solid var(--color-info);
+        }
+
+        .alternatives-container {
+            display: grid;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .alternative {
+            background: var(--bg-tertiary);
+            padding: 14px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .alternative:hover {
+            border-color: var(--color-info);
+            background: var(--bg-secondary);
+            transform: translateX(4px);
+        }
+
+        .alternative.selected {
+            background: var(--color-info);
+            color: white;
+            border-color: var(--color-info);
+        }
+
+        /* ===== DETECTOR DE PEGADINHA DA BANCA ===== */
+        .detector-pegadinha {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--color-warning);
+            border-radius: 8px;
+            padding: 16px;
+            max-width: 280px;
+            box-shadow: 0 8px 32px rgba(210, 153, 34, 0.2);
+            z-index: 100;
+            display: none;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .detector-pegadinha.show {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .detector-header {
+            font-weight: 700;
+            color: var(--color-warning);
+            margin-bottom: 12px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detector-content {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .detector-content strong {
+            color: var(--text-primary);
+        }
+
+        /* ===== FEEDBACK DUPLO: Diagnóstico + Núcleo ===== */
+        .feedback {
+            display: none;
+            padding: 0;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            animation: slideUp 0.4s ease-out;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .feedback.show {
+            display: grid;
+        }
+
+        .feedback-card {
+            padding: 16px;
+            border-radius: 6px;
+            border-left: 4px solid;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .feedback-diagnostico {
+            background: rgba(218, 54, 51, 0.1);
+            border-left-color: var(--color-danger);
+            color: var(--text-secondary);
+        }
+
+        .feedback-diagnostico strong {
+            color: var(--color-danger-light);
+        }
+
+        .feedback-nucleo {
+            background: rgba(36, 134, 54, 0.1);
+            border-left-color: var(--color-success);
+            color: var(--text-secondary);
+        }
+
+        .feedback-nucleo strong {
+            color: var(--color-success-light);
+        }
+
+        .next-button {
+            display: none;
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #1f6feb 0%, #238636 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s;
+        }
+
+        .next-button.show {
+            display: block;
+        }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+
+        .stat-item:hover {
+            background: var(--bg-secondary);
+            transform: translateY(-2px);
+            border-color: var(--color-info);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .stat-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--color-info);
+        }
+
+        .info-banner {
+            background: rgba(31, 111, 235, 0.1);
+            border-left: 4px solid var(--color-info);
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* ========== ABAS (v3.0+) ========== */
+        .tabs-navigation {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0;
+        }
+
+        .tab-button {
+            background: none;
+            border: none;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            letter-spacing: 0.3px;
+        }
+
+        .tab-button.active {
+            color: var(--color-info);
+            border-bottom-color: var(--color-info);
+        }
+
+        .tab-button:hover {
+            color: var(--color-info-light);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* ===== ABA DE ATUALIDADES ===== */
+        .atualidades-container {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .atualidade-card {
+            background: var(--bg-tertiary);
+            border-left: 4px solid var(--color-info);
+            padding: 16px;
+            margin-bottom: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid var(--border-light);
+        }
+
+        .atualidade-card:hover {
+            box-shadow: 0 4px 12px rgba(31, 111, 235, 0.15);
+            transform: translateX(4px);
+            border-color: var(--color-info);
+        }
+
+        .atualidade-titulo {
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+            font-size: 15px;
+        }
+
+        .atualidade-concurso {
+            display: inline-block;
+            background: var(--color-info);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .atualidade-conteudo {
+            color: var(--text-secondary);
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+
+        .atualidade-data {
+            color: var(--text-secondary);
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .sem-atualidades {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* ===== ABA DE REDAÇÃO (AVANÇADA) ===== */
+        .redacao-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .redacao-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .redacao-submit-box {
+            background: var(--bg-tertiary);
+            padding: 20px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .redacao-submit-box label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .redacao-submit-box textarea {
+            width: 100%;
+            min-height: 300px;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            resize: vertical;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            transition: all 0.3s;
+        }
+
+        .redacao-submit-box textarea:focus {
+            outline: none;
+            border-color: var(--color-info);
+            box-shadow: 0 0 0 3px rgba(31, 111, 235, 0.15);
+        }
+
+        .redacao-tema-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            margin-bottom: 16px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            transition: all 0.3s;
+        }
+
+        .redacao-tema-input:focus {
+            outline: none;
+            border-color: var(--color-info);
+            box-shadow: 0 0 0 3px rgba(31, 111, 235, 0.15);
+        }
+
+        .enviar-redacao-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #238636 0%, #1f6feb 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 12px;
+        }
+
+        .enviar-redacao-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(36, 134, 54, 0.3);
+        }
+
+        .redacao-resultado-box {
+            background: var(--bg-tertiary);
+            padding: 20px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .redacao-nota-grande {
+            text-align: center;
+            font-size: 56px;
+            font-weight: 700;
+            color: var(--color-success-light);
+            margin-bottom: 20px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* ===== TABELA AVANÇADA DE CRITÉRIOS ===== */
+        .criterios-tabela {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .criterios-tabela thead {
+            background: var(--bg-tertiary);
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .criterios-tabela th {
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 700;
+            color: var(--text-primary);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .criterios-tabela th:last-child {
+            border-right: none;
+        }
+
+        .criterios-tabela td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        .criterios-tabela td:last-child {
+            border-right: none;
+        }
+
+        .criterios-tabela tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .criterios-tabela .criterio-nome {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .criterios-tabela .criterio-score {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--color-info);
+        }
+
+        .barra-progresso {
+            width: 100%;
+            height: 6px;
+            background: var(--bg-tertiary);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .barra-progresso-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #238636 0%, #1f6feb 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .redacao-feedback {
+            background: var(--bg-secondary);
+            padding: 16px;
+            border-radius: 6px;
+            border-left: 4px solid var(--color-info);
+            color: var(--text-secondary);
+            font-size: 13px;
+            line-height: 1.6;
+            margin-top: 16px;
+        }
+
+        .redacao-carregando {
+            text-align: center;
+            padding: 40px;
+            color: var(--color-info);
+            font-weight: 600;
+            animation: pulse 1.5s infinite;
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+    <div class="card">
+        <div class="header">
+            <h1>🏛️ IA Concursos Elite</h1>
+            <p>Simulador de Questões - Bacen, Transpetro, PMDF | v3.1 Dark Mode</p>
+        </div>
+        
+        <div class="content">
+            <!-- PAINEL DE AUTENTICAÇÃO -->
+            <div class="auth-panel" id="authPanel">
+                <div class="info-banner">
+                    💡 Simulador com banco de dados pré-populado de questões de elite nacionais
+                </div>
+                
+                <div class="form-group">
+                    <label for="authEmail">📧 E-mail</label>
+                    <input type="email" id="authEmail" placeholder="seu@email.com" autocomplete="email">
+                </div>
+                
+                <div class="form-group">
+                    <label for="authSenha">🔐 Senha</label>
+                    <input type="password" id="authSenha" placeholder="Sua senha segura" autocomplete="current-password">
+                </div>
+                
+                <div class="form-group hidden" id="authNomeGroup">
+                    <label for="authNome">👤 Seu Nome</label>
+                    <input type="text" id="authNome" placeholder="João Silva da Conceição">
+                </div>
+                
+                <button onclick="executarAcaoPrincipal()">Entrar no Simulador</button>
+                <div class="toggle-text" onclick="alternarModo()">Não tem conta? Cadastre-se agora →</div>
+            </div>
+            
+            <!-- PAINEL DO SIMULADOR -->
+            <div class="simulator-panel" id="simPanel">
+                <div class="user-header">
+                    <div class="user-info">👤 Bem-vindo, <strong id="nomeUsuario"></strong></div>
+                    <button class="logout-btn" onclick="logout()">Sair</button>
+                </div>
+                
+                <div class="info-banner">
+                    ⚡ Questões servidas instantaneamente. Latência: <100ms | LLMLingua compression: 52-65%
+                </div>
+                
+                <!-- NAVEGAÇÃO DE ABAS -->
+                <div class="tabs-navigation" id="tabsNav">
+                    <button class="tab-button active" data-tab="questoes" onclick="alternarAba('questoes')">🎯 Questões</button>
+                    <button class="tab-button" data-tab="atualidades" onclick="alternarAba('atualidades')">📰 Atualidades</button>
+                    <button class="tab-button" data-tab="redacao" onclick="alternarAba('redacao')">✍️ Redação</button>
+                </div>
+                
+                <!-- ABA 1: QUESTÕES -->
+                <div class="tab-content active" id="abaQuestoes">
+                    <div class="selector-grid">
+                        <div>
+                            <label for="simConcurso">🏢 Concurso Elite</label>
+                            <select id="simConcurso" onchange="atualizarMaterias()">
+                                <option value="Banco Central (Bacen)">Banco Central (Bacen)</option>
+                                <option value="Transpetro (Petrobras)">Transpetro (Petrobras)</option>
+                                <option value="PMDF">PMDF</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="simMateria">📖 Matéria</label>
+                            <select id="simMateria">
+                                <option value="Português">Português</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <label>📊 Dificuldade</label>
+                    <div class="difficulty-selector">
+                        <button class="difficulty-btn active" data-difficulty="Fácil" onclick="selecionarDificuldade('Fácil', this)">🟢 Fácil</button>
+                        <button class="difficulty-btn" data-difficulty="Médio" onclick="selecionarDificuldade('Médio', this)">🟡 Médio</button>
+                        <button class="difficulty-btn" data-difficulty="Difícil" onclick="selecionarDificuldade('Difícil', this)">🔴 Difícil</button>
+                    </div>
+                    
+                    <button class="generate-btn" onclick="gerarQuestao()">⚡ Gerar Questão Instantânea</button>
+                    
+                    <div class="loading" id="statusLoading">
+                        ⏳ Carregando questão do banco de dados...
+                    </div>
+                    
+                    <div class="question-display" id="questionDisplay">
+                        <div class="question-text" id="questionText"></div>
+                        <div class="alternatives-container" id="alternativesContainer"></div>
+                        <div class="feedback" id="feedbackBox">
+                            <div class="feedback-card feedback-diagnostico" id="diagnosticoBox" style="display:none;">
+                                <strong>🔴 Por Que Você Errou:</strong><br>
+                                <div id="diagnosticoTexto"></div>
+                            </div>
+                            <div class="feedback-card feedback-nucleo" id="nucleoBox" style="display:none;">
+                                <strong>🟢 Por Que Você Acertou:</strong><br>
+                                <div id="nucleoTexto"></div>
+                            </div>
+                        </div>
+                        <button class="next-button" id="nextButton" onclick="gerarQuestao()">➡️ Próxima Questão</button>
+                    </div>
+                    
+                    <div class="stats-bar">
+                        <div class="stat-item">
+                            <div class="stat-label">Respondidas</div>
+                            <div class="stat-value" id="statTotal">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Taxa de Acertos</div>
+                            <div class="stat-value" id="statPercentual">0.00%</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Horas Estudadas</div>
+                            <div class="stat-value" id="statHoras">0.00h</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- ABA 2: ATUALIDADES -->
+                <div class="tab-content" id="abaAtualidades">
+                    <div class="info-banner">
+                        📰 Últimas notícias e atualizações relevantes para sua prova
+                    </div>
+                    
+                    <label for="filtroAtualidades">🎯 Filtrar por Concurso:</label>
+                    <select id="filtroAtualidades" style="width: 100%; margin-bottom: 20px;">
+                        <option value="">Todos os Concursos</option>
+                        <option value="Bacen">Banco Central (Bacen)</option>
+                        <option value="Transpetro">Transpetro (Petrobras)</option>
+                        <option value="PMDF">PMDF</option>
+                    </select>
+                    
+                    <div class="atualidades-container" id="atualidadesList">
+                        <div class="sem-atualidades">⏳ Carregando atualidades...</div>
+                    </div>
+                </div>
+                
+                <!-- ABA 3: REDAÇÃO (AVANÇADA) -->
+                <div class="tab-content" id="abaRedacao">
+                    <div class="info-banner">
+                        ✍️ Corretor de Redações com IA - Nota de 0 a 100 + Análise Detalhada de Critérios
+                    </div>
+                    
+                    <div class="redacao-container">
+                        <!-- Lado esquerdo: Submissão -->
+                        <div class="redacao-submit-box">
+                            <label for="redacaoTema">📝 Tema da Redação:</label>
+                            <input type="text" id="redacaoTema" class="redacao-tema-input" placeholder="Ex: Impacto da IA nos concursos públicos">
+                            
+                            <label for="redacaoTexto">Sua Redação:</label>
+                            <textarea id="redacaoTexto" placeholder="Escreva sua redação aqui... (mínimo 50 caracteres)"></textarea>
+                            
+                            <button class="enviar-redacao-btn" onclick="enviarRedacao()">🚀 Enviar para Correção</button>
+                        </div>
+                        
+                        <!-- Lado direito: Resultado -->
+                        <div>
+                            <div class="redacao-resultado-box" id="redacaoResultado" style="display:none;">
+                                <div class="redacao-nota-grande" id="redacaoNotaFinal">0.0</div>
+                                
+                                <!-- TABELA AVANÇADA DE CRITÉRIOS -->
+                                <table class="criterios-tabela">
+                                    <thead>
+                                        <tr>
+                                            <th>Critério</th>
+                                            <th>Nota</th>
+                                            <th>Progresso</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="criterio-nome">📐 Estrutura Textual</td>
+                                            <td class="criterio-score" id="criterioEstrutura">0.0</td>
+                                            <td>
+                                                <div class="barra-progresso">
+                                                    <div class="barra-progresso-fill" id="barraEstrutura" style="width: 0%;"></div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="criterio-nome">✏️ Gramática & Ortografia</td>
+                                            <td class="criterio-score" id="criterioGramatica">0.0</td>
+                                            <td>
+                                                <div class="barra-progresso">
+                                                    <div class="barra-progresso-fill" id="barraGramatica" style="width: 0%;"></div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="criterio-nome">🔗 Coesão & Conectivos</td>
+                                            <td class="criterio-score" id="criterioCoesao">0.0</td>
+                                            <td>
+                                                <div class="barra-progresso">
+                                                    <div class="barra-progresso-fill" id="barraCoesao" style="width: 0%;"></div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="criterio-nome">🎯 Domínio do Tema</td>
+                                            <td class="criterio-score" id="criterioTema">0.0</td>
+                                            <td>
+                                                <div class="barra-progresso">
+                                                    <div class="barra-progresso-fill" id="barraTema" style="width: 0%;"></div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                
+                                <div class="redacao-feedback" id="redacaoFeedback"></div>
+                            </div>
+                            
+                            <div class="redacao-carregando" id="redacaoCarregando" style="display:none;">
+                                🤖 Analisando sua redação com IA... Aguarde...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- DETECTOR DE PEGADINHA DA BANCA (Flutuante) -->
+<div class="detector-pegadinha" id="detectorPegadinha">
+    <div class="detector-header">⚡ Detector de Pegadinha</div>
+    <div class="detector-content" id="detectorConteudo"></div>
+</div>
+
+<script>
+    const API = "http://localhost:8000";
+    let modoCadastro = false;
+    let questaoAtual = null;
+    let dificuldadeSelecionada = "Fácil";
+    let timerHeartbeat = null;
+    
+    const materiasesPorConcurso = {
+        "Banco Central (Bacen)": ["Português", "Conhecimentos Gerais", "Direito Administrativo", "Direito Penal"],
+        "Transpetro (Petrobras)": ["Português", "Logística", "Conhecimentos Gerais", "Direito Penal"],
+        "PMDF": ["Português", "Direito Administrativo", "Conhecimentos Gerais", "Direito Penal"]
+    };
+
+    // ===== PADRÕES DE PEGADINHA POR BANCA =====
+    const padroesPegadinha = {
+        "Cebraspe": "⚠️ <strong>Cebraspe:</strong> Cuidado com inversão de conceitos na mesma frase! Procure por palavras-chave como 'exclusivamente', 'nunca', 'sempre' que invertem a lógica.",
+        "Cesgranrio": "⚠️ <strong>Cesgranrio:</strong> Termos muito parecidos para confundir! Diferença entre 'conquanto' vs 'porquanto' e tempos verbais sutis.",
+        "ESAF": "⚠️ <strong>ESAF:</strong> Gramática muito rigorosa. Verifique regência verbal, concordância nominal e uso de preposições.",
+        "FGV": "⚠️ <strong>FGV:</strong> Interpreta leis com rigor técnico. Procure por 'pode', 'deve', 'deverá' que indicam obrigatoriedade.",
+        "Unknown": "⚠️ <strong>Banca Desconhecida:</strong> Revisar alternativas com cuidado. Procure por palavras absolutas."
+    };
+    
+    // ========== AUTENTICAÇÃO ==========
+    window.onload = function() {
+        if (localStorage.getItem("token_concurso")) {
+            mostrarSimulador();
+        }
+    };
+    
+    function alternarModo() {
+        modoCadastro = !modoCadastro;
+        document.getElementById("authNomeGroup").classList.toggle("hidden", !modoCadastro);
+        document.querySelector("button").textContent = modoCadastro ? "📝 Criar Conta" : "🔓 Entrar";
+        document.querySelector(".toggle-text").textContent = modoCadastro ? "Já tem conta? Faça login →" : "Não tem conta? Cadastre-se agora →";
+    }
+    
+    async function executarAcaoPrincipal() {
+        const email = document.getElementById("authEmail").value;
+        const senha = document.getElementById("authSenha").value;
+        const nome = document.getElementById("authNome").value;
+        
+        if (!email || !senha || (modoCadastro && !nome)) {
+            alert("⚠️ Preencha todos os campos corretamente.");
+            return;
+        }
+        
+        const rota = modoCadastro ? "/cadastro" : "/login";
+        const payload = modoCadastro ? { email, senha, nome } : { email, senha };
+        
+        try {
+            const res = await fetch(`${API}${rota}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            const dados = await res.json();
+            
+            if (!res.ok) throw new Error(dados.detail || "Erro na operação.");
+            
+            if (modoCadastro) {
+                alert("✅ Cadastro realizado! Agora faça login.");
+                alternarModo();
+            } else {
+                localStorage.setItem("token_concurso", dados.token);
+                localStorage.setItem("email_concurso", dados.email);
+                localStorage.setItem("nome_concurso", dados.nome);
+                mostrarSimulador();
+            }
+        } catch (err) {
+            alert("❌ Erro: " + err.message);
+        }
+    }
+    
+    function mostrarSimulador() {
+        document.getElementById("authPanel").classList.add("hidden");
+        document.getElementById("simPanel").classList.add("active");
+        document.getElementById("nomeUsuario").textContent = localStorage.getItem("nome_concurso");
+        atualizarMaterias();
+        atualizarEstatisticas();
+        
+        if (timerHeartbeat) clearInterval(timerHeartbeat);
+        timerHeartbeat = setInterval(enviarHeartbeat, 60000);
+    }
+    
+    function logout() {
+        if (timerHeartbeat) clearInterval(timerHeartbeat);
+        localStorage.clear();
+        document.getElementById("simPanel").classList.remove("active");
+        document.getElementById("authPanel").classList.remove("hidden");
+        document.getElementById("authEmail").value = "";
+        document.getElementById("authSenha").value = "";
+        document.getElementById("authNome").value = "";
+    }
+    
+    // ========== QUESTÕES ==========
+    function atualizarMaterias() {
+        const concurso = document.getElementById("simConcurso").value;
+        const materias = materiasesPorConcurso[concurso] || [];
+        const select = document.getElementById("simMateria");
+        
+        select.innerHTML = materias.map(m => `<option value="${m}">${m}</option>`).join("");
+    }
+    
+    function selecionarDificuldade(dificuldade, btn) {
+        dificuldadeSelecionada = dificuldade;
+        document.querySelectorAll(".difficulty-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+    }
+    
+    function mostrarDetectorPegadinha(banca) {
+        const detector = document.getElementById("detectorPegadinha");
+        const conteudo = document.getElementById("detectorConteudo");
+        conteudo.innerHTML = padroesPegadinha[banca] || padroesPegadinha["Unknown"];
+        detector.classList.add("show");
+    }
+    
+    async function gerarQuestao() {
+        document.getElementById("statusLoading").classList.add("show");
+        document.getElementById("questionDisplay").classList.remove("show");
+        document.getElementById("feedbackBox").classList.remove("show");
+        document.getElementById("nextButton").classList.remove("show");
+        
+        const payload = {
+            email: localStorage.getItem("email_concurso"),
+            token: localStorage.getItem("token_concurso"),
+            concurso: document.getElementById("simConcurso").value,
+            materia: document.getElementById("simMateria").value,
+            dificuldade: dificuldadeSelecionada
+        };
+        
+        try {
+            const res = await fetch(`${API}/gerar-questao`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            const dados = await res.json();
+            
+            if (!res.ok) throw new Error(dados.detail || "Erro ao gerar questão.");
+            
+            questaoAtual = dados;
+            document.getElementById("questionText").textContent = dados.enunciado;
+            
+            // Mostrar detector de pegadinha
+            mostrarDetectorPegadinha(dados.banca);
+            
+            const containerAlt = document.getElementById("alternativesContainer");
+            containerAlt.innerHTML = "";
+            
+            if (dados.tipo === "Certo/Errado") {
+                ["Certo", "Errado"].forEach(opt => {
+                    const div = document.createElement("div");
+                    div.className = "alternative";
+                    div.textContent = opt;
+                    div.onclick = () => submeterResposta(opt);
+                    containerAlt.appendChild(div);
+                });
+            } else {
+                Object.keys(dados.alternativas).forEach(letra => {
+                    const div = document.createElement("div");
+                    div.className = "alternative";
+                    div.innerHTML = `<strong>${letra})</strong> ${dados.alternativas[letra]}`;
+                    div.onclick = () => submeterResposta(letra);
+                    containerAlt.appendChild(div);
+                });
+            }
+            
+            document.getElementById("statusLoading").classList.remove("show");
+            document.getElementById("questionDisplay").classList.add("show");
+            
+        } catch (err) {
+            document.getElementById("statusLoading").classList.remove("show");
+            alert("❌ Erro: " + err.message);
+        }
+    }
+    
+    async function submeterResposta(resposta) {
+        const alternatives = document.querySelectorAll(".alternative");
+        alternatives.forEach(a => a.style.pointerEvents = "none");
+        
+        const payload = {
+            email: localStorage.getItem("email_concurso"),
+            token: localStorage.getItem("token_concurso"),
+            questao_id: questaoAtual.id,
+            resposta_escolhida: resposta,
+            resposta_correta: questaoAtual.resposta_correta
+        };
+        
+        try {
+            const res = await fetch(`${API}/salvar-resposta`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            const dados = await res.json();
+            
+            if (!res.ok) throw new Error(dados.detail || "Erro ao salvar resposta.");
+            
+            const feedbackBox = document.getElementById("feedbackBox");
+            const diagnosticoBox = document.getElementById("diagnosticoBox");
+            const nucleoBox = document.getElementById("nucleoBox");
+            
+            if (dados.acertou) {
+                nucleoBox.style.display = "block";
+                diagnosticoBox.style.display = "none";
+                document.getElementById("nucleoTexto").textContent = questaoAtual.nucleo_acerto || questaoAtual.explicacao;
+            } else {
+                diagnosticoBox.style.display = "block";
+                nucleoBox.style.display = "none";
+                document.getElementById("diagnosticoTexto").textContent = questaoAtual.diagnostico_erro || questaoAtual.explicacao;
+            }
+            
+            feedbackBox.classList.add("show");
+            document.getElementById("nextButton").classList.add("show");
+            atualizarEstatisticas();
+            
+        } catch (err) {
+            alert("❌ Erro: " + err.message);
+        }
+    }
+    
+    async function enviarHeartbeat() {
+        const email = localStorage.getItem("email_concurso");
+        const token = localStorage.getItem("token_concurso");
+        if (!token) return;
+        
+        const timestamp = Math.floor(Date.now() / 1000);
+        
+        try {
+            const res = await fetch(`${API}/registrar-tempo`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, token, timestamp })
+            });
+            
+            if (res.status === 403 || res.status === 401) {
+                alert("⚠️ Sua sessão foi derrubada. Faça login novamente.");
+                logout();
+            } else if (res.ok) {
+                const dados = await res.json();
+                document.getElementById("statHoras").textContent = dados.total_horas + "h";
+            }
+        } catch (e) {
+            console.log("Heartbeat offline", e);
+        }
+    }
+    
+    async function atualizarEstatisticas() {
+        const email = localStorage.getItem("email_concurso");
+        const token = localStorage.getItem("token_concurso");
+        
+        try {
+            const res = await fetch(`${API}/estatisticas?email=${email}&token=${token}`);
+            const dados = await res.json();
+            
+            if (res.ok) {
+                document.getElementById("statTotal").textContent = dados.total;
+                document.getElementById("statPercentual").textContent = dados.percentual;
+                document.getElementById("statHoras").textContent = dados.horas_estudadas + "h";
+            }
+        } catch (e) {
+            console.log("Erro ao atualizar estatísticas", e);
+        }
+    }
+    
+    // ========== GERENCIAMENTO DE ABAS (v3.0+) ==========
+    function alternarAba(nomeAba) {
+        document.querySelectorAll(".tab-content").forEach(aba => aba.classList.remove("active"));
+        document.querySelectorAll(".tab-button").forEach(btn => btn.classList.remove("active"));
+        
+        const abaId = "aba" + nomeAba.charAt(0).toUpperCase() + nomeAba.slice(1);
+        document.getElementById(abaId).classList.add("active");
+        document.querySelector(`[data-tab="${nomeAba}"]`).classList.add("active");
+        
+        if (nomeAba === "atualidades") {
+            carregarAtualidades();
+        }
+    }
+    
+    // ========== ATUALIDADES ==========
+    async function carregarAtualidades() {
+        const filtro = document.getElementById("filtroAtualidades").value;
+        const container = document.getElementById("atualidadesList");
+        
+        try {
+            const url = filtro 
+                ? `${API}/api/v1/atualidades?concurso=${filtro}`
+                : `${API}/api/v1/atualidades`;
+            
+            const response = await fetch(url);
+            const dados = await response.json();
+            
+            if (dados.atualidades && dados.atualidades.length > 0) {
+                container.innerHTML = dados.atualidades.map(atu => `
+                    <div class="atualidade-card">
+                        <div class="atualidade-concurso">${atu.concurso_alvo}</div>
+                        <div class="atualidade-titulo">${atu.titulo}</div>
+                        <div class="atualidade-conteudo">${atu.conteudo_resumido}</div>
+                        <div class="atualidade-data">📅 ${new Date(atu.data_publicacao).toLocaleDateString('pt-BR')}</div>
+                    </div>
+                `).join("");
+            } else {
+                container.innerHTML = '<div class="sem-atualidades">Nenhuma atualidade disponível</div>';
+            }
+        } catch (e) {
+            container.innerHTML = '<div class="sem-atualidades">❌ Erro ao carregar atualidades</div>';
+        }
+    }
+    
+    // ========== REDAÇÃO (AVANÇADA) ==========
+    async function enviarRedacao() {
+        const tema = document.getElementById("redacaoTema").value.trim();
+        const texto = document.getElementById("redacaoTexto").value.trim();
+        const resultadoBox = document.getElementById("redacaoResultado");
+        const carregandoBox = document.getElementById("redacaoCarregando");
+        
+        if (!tema) {
+            alert("⚠️ Por favor, digite o tema da redação");
+            return;
+        }
+        
+        if (texto.length < 50) {
+            alert("⚠️ Sua redação deve ter pelo menos 50 caracteres");
+            return;
+        }
+        
+        resultadoBox.style.display = "none";
+        carregandoBox.style.display = "block";
+        
+        try {
+            const response = await fetch(`${API}/api/v1/corrigir-redacao`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    usuario_email: localStorage.getItem("email_concurso") || "usuario@test.com",
+                    tema: tema,
+                    texto_redacao: texto
+                })
+            });
+            
+            const dados = await response.json();
+            
+            if (response.ok) {
+                const nota = dados.nota_final.toFixed(1);
+                document.getElementById("redacaoNotaFinal").textContent = nota;
+                
+                // Atualizar tabela de critérios
+                const criteria = dados.criterios;
+                document.getElementById("criterioEstrutura").textContent = criteria.estrutura.toFixed(1);
+                document.getElementById("barraEstrutura").style.width = (criteria.estrutura * 10) + "%";
+                
+                document.getElementById("criterioGramatica").textContent = criteria.gramatica.toFixed(1);
+                document.getElementById("barraGramatica").style.width = (criteria.gramatica * 10) + "%";
+                
+                document.getElementById("criterioCoesao").textContent = criteria.coesao.toFixed(1);
+                document.getElementById("barraCoesao").style.width = (criteria.coesao * 10) + "%";
+                
+                document.getElementById("criterioTema").textContent = criteria.tema.toFixed(1);
+                document.getElementById("barraTema").style.width = (criteria.tema * 10) + "%";
+                
+                document.getElementById("redacaoFeedback").textContent = dados.feedback;
+                
+                carregandoBox.style.display = "none";
+                resultadoBox.style.display = "block";
+            } else {
+                alert("❌ Erro ao corrigir redação: " + (dados.detail || "Tente novamente"));
+                carregandoBox.style.display = "none";
+            }
+        } catch (e) {
+            alert("❌ Erro ao conectar ao servidor: " + e.message);
+            carregandoBox.style.display = "none";
+        }
+    }
+</script>
+
+</body>
+</html>

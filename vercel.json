@@ -1,0 +1,15 @@
+{
+  "buildCommand": "echo 'Frontend static deployment'",
+  "installCommand": "echo 'No dependencies needed for static HTML'",
+  "outputDirectory": "frontend",
+  "public": false,
+  "regions": ["sfo1"],
+  "env": {
+    "API_URL": "https://concurso-elite-api.railway.app"
+  },
+  "functions": {
+    "api/**": {
+      "runtime": "python3.9"
+    }
+  }
+}

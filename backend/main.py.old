@@ -1,0 +1,259 @@
+import os
+import json
+import secrets
+import hmac
+import hashlib
+from fastapi import FastAPI, HTTPException, Depends, Request
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from typing import Dict, List, Optional
+from sqlalchemy import create_engine, Column, Integer, String, Boolean, Text, Float
+from sqlalchemy.orm import declarative_base, sessionmaker, Session
+import requests
+
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://admin:senha_segura_123@postgres_db:5432/site_concursos")
+OLLAMA_API_URL = os.getenv("OLLAMA_API_URL", "http://localhost:11434")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "concursos-elite")
+CHAVE_SECRETA_HMAC = b"DIRETRIZ_SEGURANCA_MAXIMA_CONCURSOS_2026"
+
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
+
+class UsuarioModel(Base):
+    __tablename__ = "usuarios"
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, unique=True, index=True, nullable=False)
+    senha = Column(String, nullable=False)
+    nome = Column(String, nullable=False)
+    minutos_estudados = Column(Float, default=0.0)
+
+class SessaoAtivaModel(Base):
+    __tablename__ = "sessoes_ativas"
+    id = Column(Integer, primary_key=True, index=True)
+    usuario_email = Column(String, unique=True, index=True, nullable=False)
+    token_sessao = Column(String, nullable=False)
+    ip_ultimo = Column(String, nullable=False)
+    aparelho_user_agent = Column(String, nullable=False)
+
+class HistoricoQuestoesModel(Base):
+    __tablename__ = "historico_questoes"
+    id = Column(Integer, primary_key=True, index=True)
+    usuario_email = Column(String, nullable=False)
+    questao_id = Column(String, nullable=False)
+    resultado_acerto = Column(Boolean, nullable=False)
+
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI(title="Motor de Questões com Ollama Local (Custo Zero)")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+class CadastroDados(BaseModel):
+    email: str
+    senha: str
+    nome: str
+
+class LoginDados(BaseModel):
+    email: str
+    senha: str
+
+class SolicitacaoQuestao(BaseModel):
+    email: str
+    token: str
+    concurso: str
+    materia: str
+    dificuldade: str
+
+class RespostaUsuario(BaseModel):
+    email: str
+    token: str
+    questao_id: str
+    resposta_escolhida: str
+    resposta_correta: str
+
+class SinalTempo(BaseModel):
+    email: str
+    token: str
+    timestamp: int
+    assinatura_criptografica: str
+
+def verificar_seguranca_sessao(email: str, token_enviado: str, db: Session):
+    email_limpo = email.strip().lower()
+    sessao = db.query(SessaoAtivaModel).filter(SessaoAtivaModel.usuario_email == email_limpo).first()
+    if not sessao:
+        raise HTTPException(status_code=401, detail="Sessão não encontrada. Faça login novamente.")
+    if sessao.token_sessao != token_enviado:
+        raise HTTPException(
+            status_code=403,
+            detail="⚠️ ACESSO BLOQUEADO: Seu login foi aberto em outro aparelho. O rateio de contas é proibido."
+        )
+    return True
+
+@app.post("/cadastro")
+def cadastrar_usuario(dados: CadastroDados, db: Session = Depends(get_db)):
+    email_limpo = dados.email.strip().lower()
+    usuario_existe = db.query(UsuarioModel).filter(UsuarioModel.email == email_limpo).first()
+    if usuario_existe:
+        raise HTTPException(status_code=400, detail="Este e-mail já está cadastrado no sistema.")
+    novo_usuario = UsuarioModel(email=email_limpo, senha=dados.senha, nome=dados.nome)
+    db.add(novo_usuario)
+    db.commit()
+    return {"status": "sucesso", "mensagem": "Usuário cadastrado com sucesso!"}
+
+@app.post("/login")
+def login(dados: LoginDados, request: Request, db: Session = Depends(get_db)):
+    email_limpo = dados.email.strip().lower()
+    usuario = db.query(UsuarioModel).filter(UsuarioModel.email == email_limpo).first()
+    if not usuario or usuario.senha != dados.senha:
+        raise HTTPException(status_code=400, detail="E-mail ou senha inválidos.")
+    
+    novo_token = f"sess_{secrets.token_hex(16)}"
+    sessao_existente = db.query(SessaoAtivaModel).filter(SessaoAtivaModel.usuario_email == email_limpo).first()
+    
+    if sessao_existente:
+        sessao_existente.token_sessao = novo_token
+        sessao_existente.ip_ultimo = request.client.host
+        sessao_existente.aparelho_user_agent = request.headers.get("user-agent", "Desconhecido")
+    else:
+        nova_sessao = SessaoAtivaModel(
+            usuario_email=email_limpo,
+            token_sessao=novo_token,
+            ip_ultimo=request.client.host,
+            aparelho_user_agent=request.headers.get("user-agent", "Desconhecido")
+        )
+        db.add(nova_sessao)
+    
+    db.commit()
+    return {"status": "sucesso", "token": novo_token, "nome": usuario.nome, "email": usuario.email}
+
+@app.post("/gerar-questao")
+def gerar_questao(dados: SolicitacaoQuestao, db: Session = Depends(get_db)):
+    verificar_seguranca_sessao(dados.email, dados.token, db)
+    
+    if dados.concurso == "PMDF":
+        banca_ref = "CEBRASPE (Certo/Errado)"
+        tipo_questao = "Certo/Errado"
+    elif dados.concurso == "STT":
+        banca_ref = "Exército Brasileiro (Múltipla Escolha)"
+        tipo_questao = "Múltipla Escolha"
+    else:
+        raise HTTPException(status_code=400, detail="Concurso não suportado.")
+    
+    prompt = f"""Gere uma questão inédita para o concurso {dados.concurso} (Banca: {banca_ref}), matéria {dados.materia}, nível {dados.dificuldade}. 
+    Retorne APENAS o JSON puro com as chaves: id, enunciado, tipo, alternativas, resposta_correta, explicacao, pegadinha_banca. 
+    Nenhum texto fora do JSON."""
+    
+    try:
+        response = requests.post(
+            f"{OLLAMA_API_URL}/api/generate",
+            json={
+                "model": OLLAMA_MODEL,
+                "prompt": prompt,
+                "stream": False
+            },
+            timeout=30
+        )
+        
+        if response.status_code != 200:
+            raise HTTPException(status_code=500, detail="Ollama retornou erro.")
+        
+        resultado = response.json()
+        texto_resposta = resultado.get("response", "").strip()
+        
+        if texto_resposta.startswith("```json"):
+            texto_resposta = texto_resposta.replace("```json", "").replace("```", "").strip()
+        elif texto_resposta.startswith("```"):
+            texto_resposta = texto_resposta.replace("```", "").strip()
+        
+        dados_questao = json.loads(texto_resposta)
+        
+        if "id" not in dados_questao or "enunciado" not in dados_questao:
+            raise ValueError("JSON retornado sem chaves obrigatórias.")
+        
+        return dados_questao
+        
+    except requests.exceptions.ConnectionError:
+        raise HTTPException(status_code=503, detail="Ollama não está acessível. Verifique se está rodando em localhost:11434")
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=500, detail="Ollama retornou formato inválido.")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erro ao gerar questão: {str(e)}")
+
+@app.post("/salvar-resposta")
+def salvar_resposta(dados: RespostaUsuario, db: Session = Depends(get_db)):
+    verificar_seguranca_sessao(dados.email, dados.token, db)
+    
+    acertou = dados.resposta_escolhida.upper() == dados.resposta_correta.upper()
+    novo_historico = HistoricoQuestoesModel(
+        usuario_email=dados.email.strip().lower(),
+        questao_id=dados.questao_id,
+        resultado_acerto=acertou
+    )
+    db.add(novo_historico)
+    db.commit()
+    
+    return {"status": "salvo", "acertou": acertou}
+
+@app.post("/registrar-tempo")
+def registrar_tempo(dados: SinalTempo, db: Session = Depends(get_db)):
+    verificar_seguranca_sessao(dados.email, dados.token, db)
+    
+    email_limpo = dados.email.strip().lower()
+    mensagem_validacao = f"{email_limpo}:{dados.token}:{dados.timestamp}".encode('utf-8')
+    hash_esperado = hmac.new(CHAVE_SECRETA_HMAC, mensagem_validacao, hashlib.sha256).hexdigest()
+    
+    if not hmac.compare_digest(hash_esperado, dados.assinatura_criptografica):
+        raise HTTPException(
+            status_code=400,
+            detail="⚠️ FRAUDE DETECTADA: Assinatura de telemetria inválida ou modificada por robô."
+        )
+    
+    usuario = db.query(UsuarioModel).filter(UsuarioModel.email == email_limpo).first()
+    if usuario:
+        usuario.minutos_estudados += 1.0
+        db.commit()
+        horas = round(usuario.minutos_estudados / 60, 2)
+        return {"status": "sincronizado", "total_horas": horas}
+    
+    raise HTTPException(status_code=404, detail="Usuário não encontrado.")
+
+@app.get("/estatisticas")
+def obter_estatisticas(email: str, token: str, db: Session = Depends(get_db)):
+    email_limpo = email.strip().lower()
+    verificar_seguranca_sessao(email_limpo, token, db)
+    
+    usuario = db.query(UsuarioModel).filter(UsuarioModel.email == email_limpo).first()
+    questoes = db.query(HistoricoQuestoesModel).filter(HistoricoQuestoesModel.usuario_email == email_limpo).all()
+    
+    total = len(questoes)
+    if total == 0:
+        return {"total": 0, "acertos": 0, "percentual": "0.00%", "horas_estudadas": 0.0}
+    
+    acertos = sum(1 for q in questoes if q.resultado_acerto)
+    percentual = (acertos / total) * 100
+    horas = round(usuario.minutos_estudados / 60, 2) if usuario else 0.0
+    
+    return {
+        "total": total,
+        "acertos": acertos,
+        "percentual": f"{percentual:.2f}%",
+        "horas_estudadas": horas
+    }
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok", "ollama_url": OLLAMA_API_URL, "ollama_model": OLLAMA_MODEL}
