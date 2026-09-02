@@ -51,13 +51,38 @@ class SincronizarRequest(BaseModel):
 USUARIOS_REGISTRADOS = {
     "mr.dblucas@gmail.com": {
         "email": "mr.dblucas@gmail.com",
-        "senha_hash": "hashed_Lightshigaraki789",  # Em produção usar BCRYPT
-        "mac_registrado": None,  # Será definido no primeiro login
+        "senha_hash": "hashed_Lightshigaraki789",
+        "mac_registrado": None,
         "data_criacao": datetime.now().isoformat(),
         "tokens_ativos": [],
         "bloqueado": False,
         "bloqueio_motivo": None,
-        "bloqueio_ate": None
+        "bloqueio_ate": None,
+        "tipo": "admin"
+    },
+    "cabo.md@email.com": {
+        "email": "cabo.md@email.com",
+        "senha_hash": "hashed_cabo123",
+        "mac_registrado": None,
+        "data_criacao": datetime.now().isoformat(),
+        "tokens_ativos": [],
+        "bloqueado": False,
+        "bloqueio_motivo": None,
+        "bloqueio_ate": None,
+        "tipo": "usuario",
+        "nome": "Cabo Do MD"
+    },
+    "matheus@email.com": {
+        "email": "matheus@email.com",
+        "senha_hash": "hashed_matheus123",
+        "mac_registrado": None,
+        "data_criacao": datetime.now().isoformat(),
+        "tokens_ativos": [],
+        "bloqueado": False,
+        "bloqueio_motivo": None,
+        "bloqueio_ate": None,
+        "tipo": "usuario",
+        "nome": "Motoboy Matheus"
     }
 }
 
@@ -118,7 +143,7 @@ async def login_novo(request: LoginRequest) -> dict:
     if request.latitude and request.longitude:
         verificador_geo = VerificadorGeofencing()
         resultado_geo = verificador_geo.verificar_localizacao(
-            request.latitude, request.longitude
+            request.latitude, request.longitude, email
         )
         
         if not resultado_geo["autorizado"]:
@@ -234,7 +259,7 @@ async def sincronizar(request: SincronizarRequest) -> dict:
     # 1. Verificar geofencing
     verificador_geo = VerificadorGeofencing()
     resultado_geo = verificador_geo.verificar_localizacao(
-        request.latitude, request.longitude
+        request.latitude, request.longitude, email
     )
     
     if not resultado_geo["autorizado"]:

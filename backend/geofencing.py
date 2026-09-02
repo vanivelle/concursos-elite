@@ -10,15 +10,15 @@ import math
 import logging
 
 # ============================================================================
-# 🗺️ CONFIGURAÇÃO DE PONTOS CONFIÁVEIS
+# 🗺️ CONFIGURAÇÃO DE PONTOS CONFIÁVEIS GLOBAIS
 # ============================================================================
 
-PONTOS_CONFIANCIA = {
+PONTOS_CONFIANCIA_GLOBAIS = {
     "valparaiso_2": {
         "nome": "Valparaíso 2, Céu Azul",
-        "latitude": -15.8268,  # Brasília - Valparaíso II
+        "latitude": -15.8268,
         "longitude": -48.0409,
-        "raio_metros": 500,    # 500m de tolerância
+        "raio_metros": 500,
         "horario_inicio": "00:00",
         "horario_fim": "23:59",
         "dias": ["seg", "ter", "qua", "qui", "sex", "sab", "dom"],
@@ -27,24 +27,59 @@ PONTOS_CONFIANCIA = {
     
     "gama": {
         "nome": "GAMA",
-        "latitude": -15.8500,  # Gama - Brasília
+        "latitude": -15.8500,
         "longitude": -48.0600,
-        "raio_metros": 1000,   # 1km de tolerância
-        "horario_inicio": "14:00",
-        "horario_fim": "22:00",  # 14h até 22h
+        "raio_metros": 1000,
+        "horario_inicio": "06:00",
+        "horario_fim": "23:59",
+        "dias": ["seg", "ter", "qua", "qui", "sex", "sab", "dom"],
+        "descricao": "Trabalho - Gama (Motoboy Matheus)"
+    },
+    
+    "plano_piloto": {
+        "nome": "Plano Piloto",
+        "latitude": -15.7975,
+        "longitude": -47.8822,
+        "raio_metros": 2000,
+        "horario_inicio": "08:00",
+        "horario_fim": "18:00",
         "dias": ["seg", "ter", "qua", "qui", "sex"],
-        "descricao": "Trabalho - 14h em diante"
+        "descricao": "Trabalho - Plano Piloto (Cabo do MD)"
     },
     
     "senai": {
         "nome": "SENAI",
-        "latitude": -15.7975,  # SENAI - Brasília (estimado)
+        "latitude": -15.7975,
         "longitude": -48.0494,
-        "raio_metros": 500,    # 500m de tolerância
+        "raio_metros": 500,
         "horario_inicio": "08:00",
-        "horario_fim": "13:00",  # Manhã até 13h
+        "horario_fim": "13:00",
         "dias": ["seg", "ter", "qua", "qui", "sex"],
         "descricao": "SENAI - Manhã (até 13h)"
+    }
+}
+
+# ============================================================================
+# 👤 CONFIGURAÇÃO POR USUÁRIO (Pontos Permitidos)
+# ============================================================================
+
+PONTOS_POR_USUARIO = {
+    "mr.dblucas@gmail.com": {
+        "nome": "Admin",
+        "pontos_permitidos": ["valparaiso_2"],
+        "descricao": "Admin - Apenas casa"
+    },
+    
+    "cabo.md@email.com": {
+        "nome": "Cabo Do MD",
+        "pontos_permitidos": ["valparaiso_2", "plano_piloto"],
+        "descricao": "Cabo - Casa + Trabalho (Plano Piloto)"
+    },
+    
+    "matheus@email.com": {
+        "nome": "Motoboy Matheus",
+        "pontos_permitidos": ["gama"],
+        "descricao": "Motoboy - Trabalho (Gama)"
     }
 }
 
@@ -113,15 +148,24 @@ class VerificadorGeofencing:
             ponto["longitude"]
         )
     
-    def verificar_localizacao(self, lat: float, lon: float) -> Dict:
+    def verificar_localizacao(self, lat: float, lon: float, email: str = None) -> Dict:
         """
         Verifica se localização está em ponto confiável
+        Se email fornecido, verifica apenas os pontos permitidos para esse usuário
         Retorna: {autorizado, ponto, distancia, motivo}
         """
         agora = datetime.now()
         resultados = []
         
-        for chave, ponto in PONTOS_CONFIANCIA.items():
+        # Se email fornecido, pegar apenas pontos daquele usuário
+        if email and email in PONTOS_POR_USUARIO:
+            pontos_permitidos = PONTOS_POR_USUARIO[email]["pontos_permitidos"]
+            pontos_verificar = {k: v for k, v in PONTOS_CONFIANCIA_GLOBAIS.items() 
+                               if k in pontos_permitidos}
+        else:
+            pontos_verificar = PONTOS_CONFIANCIA_GLOBAIS
+        
+        for chave, ponto in pontos_verificar.items():
             distancia = self._calcular_distancia_para_ponto(lat, lon, ponto)
             
             # Verificar se dentro do raio
@@ -158,6 +202,12 @@ class VerificadorGeofencing:
                 }
         
         # Nenhum ponto autorizado
+        if not pontos_verificar:
+            return {
+                "autorizado": False,
+                "motivo": "Nenhum ponto de confiança configurado para este usuário"
+            }
+        
         ponto_mais_proximo = min(resultados, key=lambda x: x["distancia_metros"])
         
         self.logger.warning(f"❌ Localização não autorizada")
@@ -175,11 +225,19 @@ class VerificadorGeofencing:
             "detalhes": resultados
         }
     
-    def obter_proximos_pontos(self, lat: float, lon: float) -> list:
+    def obter_proximos_pontos(self, lat: float, lon: float, email: str = None) -> list:
         """Retorna pontos confiáveis ordenados por distância"""
         resultados = []
         
-        for chave, ponto in PONTOS_CONFIANCIA.items():
+        # Se email fornecido, pegar apenas pontos daquele usuário
+        if email and email in PONTOS_POR_USUARIO:
+            pontos_permitidos = PONTOS_POR_USUARIO[email]["pontos_permitidos"]
+            pontos_verificar = {k: v for k, v in PONTOS_CONFIANCIA_GLOBAIS.items() 
+                               if k in pontos_permitidos}
+        else:
+            pontos_verificar = PONTOS_CONFIANCIA_GLOBAIS
+        
+        for chave, ponto in pontos_verificar.items():
             distancia = self._calcular_distancia_para_ponto(lat, lon, ponto)
             resultados.append({
                 "chave": chave,
@@ -207,7 +265,7 @@ class AlertasGeofencing:
     def verificar_e_alertar(self, email: str, mac: str, lat: float, 
                            lon: float, cidade: str) -> Dict:
         """Verifica localização e gera alertas se necessário"""
-        verificacao = self.verificador.verificar_localizacao(lat, lon)
+        verificacao = self.verificador.verificar_localizacao(lat, lon, email)
         
         if verificacao["autorizado"]:
             self.logger.info(f"✅ {email} em local autorizado: "
