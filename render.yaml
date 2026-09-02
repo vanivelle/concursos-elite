@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: concurso-elite-api
+    env: python
+    region: oregon
+    plan: free
+    
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn backend.main_enterprise:app --host 0.0.0.0 --port $PORT
+    
+    envVars:
+      - key: DATABASE_URL
+        value: postgresql://postgres:Lightshigaraki789@db.lnnwefppeaaqhpjqpdvz.supabase.co:5432/postgres
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: SECRET_KEY
+        value: diretriz_seguranca_maxima_concursos_2026_mr_dblucas_admin
+      - key: CORS_ORIGINS
+        value: "https://open-notebook-8x8twkj23.vercel.app,http://localhost:3000"
