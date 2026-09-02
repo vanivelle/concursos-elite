@@ -3,6 +3,7 @@
 🔐 CONCURSO ELITE v3.3 - BACKEND ENTERPRISE COM TUDO
 Versão com: MAC Tracking, Geolocalização, Cronômetro Inteligente,
 Monitoramento de Produtividade, Histórico de Editais Transpetro
++ BLOQUEIOS AVANÇADOS: IPv6, VPN/Tor, VM, GPU Cloud
 """
 
 import os
@@ -16,6 +17,7 @@ from typing import Dict, List, Optional, Tuple
 from functools import wraps
 import time
 from math import radians, cos, sin, asin, sqrt
+import socket
 
 from fastapi import FastAPI, HTTPException, Depends, Request, Header
 from fastapi.middleware.cors import CORSMiddleware
@@ -30,6 +32,12 @@ try:
     import geoip2.database  # Para geolocalização
 except ImportError:
     print("⚠️  Instale: pip install python-jose passlib bcrypt geoip2 maxminddb")
+
+# Importar detector de segurança avançada
+try:
+    from security_advanced_blocks import DetectorSegurancaAvancada
+except ImportError:
+    print("⚠️  Copie security_advanced_blocks.py para pasta backend/")
 
 # ============================================================
 # 📊 LOGGING & AUDITORIA AVANÇADA
@@ -384,6 +392,60 @@ async def login_enterprise(req: LoginComMACRequest, request: Request):
     """Login com rastreamento de MAC address e geolocalização"""
     
     ip = request.client.host
+    
+    # ============================================================
+    # 🔒 BLOQUEIOS AVANÇADOS DE SEGURANÇA (IPv6, VPN, VM, GPU Cloud)
+    # ============================================================
+    
+    user_agent = request.headers.get("user-agent", "")
+    hostname = ""  # Seria obtido de reverse DNS em produção
+    
+    try:
+        # Tentar resolver hostname a partir do IP
+        hostname, _, _ = socket.gethostbyaddr(ip)
+    except (socket.herror, OSError):
+        hostname = f"ip-{ip.replace('.', '-')}"
+    
+    # Executar verificação completa de segurança
+    resultado_seguranca = DetectorSegurancaAvancada.verificacao_completa(
+        ip, user_agent, hostname
+    )
+    
+    if resultado_seguranca["bloqueado"]:
+        # Bloquear acesso imediatamente
+        razoes = ", ".join(resultado_seguranca["razoes"])
+        logger.critical(f"🚫 BLOQUEIO DE SEGURANÇA AVANÇADA: {req.email} @ {ip}")
+        logger.critical(f"   Razões: {razoes}")
+        logger.critical(f"   Detalhes: {json.dumps(resultado_seguranca['detalhes'])}")
+        
+        # Registrar tentativa bloqueada na auditoria
+        db = SessionLocal()
+        try:
+            auditoria_log = LoginAuditadoModel(
+                email=req.email,
+                mac_address=req.mac_address,
+                ip=ip,
+                cidade="BLOQUEADO",
+                pais="BLOQUEADO",
+                sucesso=False
+            )
+            db.add(auditoria_log)
+            db.commit()
+        except:
+            pass
+        finally:
+            db.close()
+        
+        # Retornar erro com razão clara
+        raise HTTPException(
+            status_code=403,
+            detail=f"Acesso negado por segurança. Motivo: {razoes}. Contate administrador."
+        )
+    
+    # ============================================================
+    # ✅ Passou na verificação de segurança avançada
+    # ============================================================
+    
     cidade, lat, lon = GeolocalizacaoManager.estimar_cidade(ip)
     
     db = SessionLocal()
