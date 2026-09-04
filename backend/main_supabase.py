@@ -9,7 +9,9 @@ from psycopg2.extras import RealDictCursor
 import json
 
 # ============ SUPABASE CONNECTION ============
-DB_URL = os.getenv("DATABASE_URL", "postgresql://postgres:Lightshigaraki789@db.lnnwefppeaaqhpjqpdvz.supabase.co:5432/postgres")
+DB_URL = os.getenv("DATABASE_URL")
+if not DB_URL:
+    raise ValueError("ERROR: DATABASE_URL environment variable not set. Set it before starting the application.")
 
 def get_db():
     try:
