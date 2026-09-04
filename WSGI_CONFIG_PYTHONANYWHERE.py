@@ -1,8 +1,8 @@
 
 # WSGI CONFIGURATION FOR PYTHONANYWHERE
 # Copy and paste this content to:
-# https://www.pythonanywhere.com/user/meu-concurso-elite/webapps/
-# Edit WSGI file -> /var/www/meu-concurso-elite_pythonanywhere_com_wsgi.py
+# https://www.pythonanywhere.com/user/concursoelite/webapps/
+# Edit WSGI file -> /var/www/concursoelite_pythonanywhere_com_wsgi.py
 
 import sys
 import os
@@ -10,8 +10,8 @@ from pathlib import Path
 
 # Environment variables
 os.environ['DATABASE_URL'] = '''postgresql://postgres:Lightshigaraki789@db.lnnwefppeaaqhpjqpdvz.supabase.co:5432/postgres'''
-os.environ['SECRET_KEY'] = '''secret-key-xyz-123'''
-os.environ['CORS_ORIGINS'] = 'https://open-notebook-8x8twkj23.vercel.app,https://meu-concurso-elite.pythonanywhere.com'
+os.environ['SECRET_KEY'] = '''super-secret-key-min-32-chars-xyz123'''
+os.environ['CORS_ORIGINS'] = 'https://open-notebook-8x8twkj23.vercel.app,https://concursoelite.pythonanywhere.com'
 os.environ['PYTHONUNBUFFERED'] = '1'
 
 # Path configuration
