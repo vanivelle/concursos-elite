@@ -9,7 +9,7 @@ from psycopg2.extras import RealDictCursor
 import json
 
 # ============ SUPABASE CONNECTION ============
-DB_URL = "postgresql://postgres:Lightshigaraki789@db.lnnwefppeaaqhpjqpdvz.supabase.co:5432/postgres"
+DB_URL = os.getenv("DATABASE_URL", "postgresql://postgres:Lightshigaraki789@db.lnnwefppeaaqhpjqpdvz.supabase.co:5432/postgres")
 
 def get_db():
     try:
